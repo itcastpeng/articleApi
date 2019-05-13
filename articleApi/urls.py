@@ -1,0 +1,49 @@
+"""articleApi URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/1.10/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.conf.urls import url, include
+    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
+"""
+from django.conf.urls import url
+from article_api.views_dir import login, user, permissions, role, settlement_rules, article, celery_views
+
+urlpatterns = [
+
+    # 账号密码登录
+    url(r'^login$', login.login),
+
+    # 用户
+    url(r'^user/(?P<oper_type>\w+)/(?P<o_id>\d+)$', user.user_oper),
+    url(r'^user$', user.user),
+
+    # 权限管理
+    url(r'^permissions/(?P<oper_type>\w+)/(?P<o_id>\d+)$', permissions.permissions_oper),
+    url(r'^permissions$', permissions.permissions),
+
+    # 角色管理
+    url(r'^role/(?P<oper_type>\w+)/(?P<o_id>\d+)$', role.role_oper),
+    url(r'^role', role.role),
+
+    # 文章管理
+    url(r'^article/(?P<oper_type>\w+)/(?P<o_id>\d+)$', article.article_oper),
+    url(r'^article$', article.article),
+
+    # 结算管理
+    # url(r'^settlement_rules/(?P<oper_type>\w+)/(?P<o_id>\d+)$', settlement_rules.settlement_rules_oper),
+    # url(r'^settlement_rules', settlement_rules.settlement_rules),
+
+    # celery 执行视图
+    url(r'^send_article$', celery_views.send_article),  # 上传文章
+    url(r'^article_read_detail$', celery_views.article_read_detail),  # 获取文章阅读情况
+]
+
+
