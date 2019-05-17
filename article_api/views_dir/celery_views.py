@@ -1,6 +1,5 @@
 
 from article_api import models
-from article_api.publicFunc import Response, account, the_output
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.db.models import Q

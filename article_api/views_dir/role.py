@@ -5,7 +5,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from article_api.publicFunc.condition_com import conditionCom
 from article_api.forms.role import AddForm, UpdateForm, SelectForm
-from article_api.views_dir.permissions import init_data
 import json
 
 
@@ -48,11 +47,11 @@ def role(request):
             for obj in objs:
 
                 # 获取选中的id，然后组合成前端能用的数据
-                permissionsData = []
-                if obj.permissions:
-                    permissionsList = [i['id'] for i in obj.permissions.values('id')]
-                    if len(permissionsList) > 0:
-                        permissionsData = init_data(selected_list=permissionsList)
+                # permissionsData = []
+                # if obj.permissions:
+                #     permissionsList = [i['id'] for i in obj.permissions.values('id')]
+                #     if len(permissionsList) > 0:
+                #         permissionsData = init_data(selected_list=permissionsList)
 
                 #  如果有oper_user字段 等于本身名字
                 if obj.oper_user:
@@ -66,7 +65,7 @@ def role(request):
                 ret_data.append({
                     'id': obj.id,
                     'name': obj.name,                           # 角色名称
-                    'permissionsData': permissionsData,         # 角色权限
+                    # 'permissionsData': permissionsData,         # 角色权限
                     'oper_user_id': oper_user_id,               # 操作人ID
                     'oper_user__username': oper_user_username,  # 操作人
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),

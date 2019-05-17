@@ -14,7 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from article_api.views_dir import login, user, permissions, role, settlement_rules, article, celery_views
+from article_api.views_dir import login, user, permissions, role, settlement_rules, article, celery_views, \
+    classfiy
 
 urlpatterns = [
 
@@ -26,12 +27,16 @@ urlpatterns = [
     url(r'^user$', user.user),
 
     # 权限管理
-    url(r'^permissions/(?P<oper_type>\w+)/(?P<o_id>\d+)$', permissions.permissions_oper),
-    url(r'^permissions$', permissions.permissions),
+    # url(r'^permissions/(?P<oper_type>\w+)/(?P<o_id>\d+)$', permissions.permissions_oper),
+    # url(r'^permissions$', permissions.permissions),
 
     # 角色管理
     url(r'^role/(?P<oper_type>\w+)/(?P<o_id>\d+)$', role.role_oper),
     url(r'^role', role.role),
+
+    # 分类管理
+    url(r'^classfiy/(?P<oper_type>\w+)/(?P<o_id>\d+)$', classfiy.classfiy_oper),
+    url(r'^classfiy', classfiy.classfiy),
 
     # 文章管理
     url(r'^article/(?P<oper_type>\w+)/(?P<o_id>\d+)$', article.article_oper),

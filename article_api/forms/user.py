@@ -45,7 +45,12 @@ class AddForm(forms.Form):
             'required': "电话类型错误"
         }
     )
-
+    set_avator = forms.CharField(
+        required=False,
+        error_messages={
+            'required': "头像类型错误"
+        }
+    )
     # 查询名称是否存在
     def clean_username(self):
         username = self.data['username']

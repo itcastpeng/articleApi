@@ -26,7 +26,7 @@ class AddForm(forms.Form):
         }
     )
 
-    articlePic = forms.CharField(
+    article_cover = forms.CharField(
         required=True,
         error_messages={
             'required': "文章图片不能为空"
@@ -100,7 +100,7 @@ class UpdateForm(forms.Form):
         }
     )
 
-    articlePic = forms.CharField(
+    article_cover = forms.CharField(
         required=True,
         error_messages={
             'required': "文章图片不能为空"
@@ -127,10 +127,11 @@ class UpdateForm(forms.Form):
 
     # 查询名称是否存在
     def clean_title(self):
-        title = self.data['title']
+        title = self.data.get('title')
+        o_id = self.data.get('o_id')
         objs = models.article.objects.filter(
             title=title,
-        )
+        ).exclude(id=o_id)
         if objs:
             self.add_error('title', '亲, 文章标题被占用啦!')
         else:

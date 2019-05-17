@@ -1,6 +1,5 @@
 from article_api import models
 from article_api.publicFunc import Response, account
-from article_api.publicFunc.the_output import success_output_msg, error_output_msg, output_msg
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from article_api.publicFunc.condition_com import conditionCom

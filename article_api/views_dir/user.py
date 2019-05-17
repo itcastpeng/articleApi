@@ -1,6 +1,5 @@
 from article_api import models
 from article_api.publicFunc import Response, account
-from article_api.publicFunc.the_output import success_output_msg, error_output_msg, output_msg
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from article_api.publicFunc.condition_com import conditionCom
@@ -20,13 +19,13 @@ def user(request):
         order = request.GET.get('order', '-create_date')
         field_dict = {
             'id': '',
+            'status': '',
             'role_id': '',
             'create_date': '',
             'oper_user__username': '__contains',
         }
 
         q = conditionCom(request, field_dict)
-        output_msg(q, 'q')
 
         objs = models.userprofile.objects.select_related('role').filter(q).order_by(order)
 
@@ -40,9 +39,10 @@ def user(request):
         # 返回的数据
         ret_data = []
         now = datetime.date.today()
-        output_msg(now, 'now')
         for obj in objs:
-
+            last_login_time = ''
+            if obj.last_login_time:
+                last_login_time = obj.last_login_time.strftime('%Y-%m-%d %H:%M:%S')
             #  将查询出来的数据 加入列表
             ret_data.append({
                 'id': obj.id,
@@ -55,6 +55,7 @@ def user(request):
                 'get_status_display': obj.get_status_display(),     # 用户状态 (审核, 未审核)
                 'set_avator': obj.set_avator,                       # 头像
                 'phone': obj.phone,                                 # 电话
+                'last_login_time': last_login_time,                 # 最后一次登录时间
                 'create_time': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
             })
 
@@ -66,6 +67,7 @@ def user(request):
             'data_count': count,
             'status':models.userprofile.status_choices
             }
+
     else:
         response.code = 301
         response.msg = json.loads(forms_obj.errors.as_json())
@@ -118,45 +120,36 @@ def user_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "POST":
+        # 获取需要修改的信息
+        form_data = {
+            'o_id': o_id,
+            'username': request.POST.get('username'),  # 用户名
+            'role_id': request.POST.get('role_id'),  # 角色ID
+            'oper_user_id': request.GET.get('user_id'),  # 操作人
+            'set_avator': request.POST.get('set_avator'),  # 头像
+            'phone': request.POST.get('phone'),  # 电话
+            'password': request.POST.get('password'),  # 密码
+        }
+
         # 添加用户
         if oper_type == "add":
-            form_data = {
-                'oper_user_id': request.GET.get('user_id'),         # 操作人ID
-                'username': request.POST.get('username'),           # 用户名
-                'role_id': request.POST.get('role_id'),             # 角色ID
-                'password': request.POST.get('password'),           # 密码
-                'phone': request.POST.get('phone'),                 # 电话
-            }
-            print('form_data----->',form_data)
-            #  创建 form验证 实例（参数默认转成字典）
 
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-                print(forms_obj.cleaned_data)
-                #  添加数据库
                 models.userprofile.objects.create(**forms_obj.cleaned_data)
+
                 response.code = 200
                 response.msg = "添加成功"
+
             else:
-                print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
         # 修改用户
         elif oper_type == "update":
-            # 获取需要修改的信息
-            form_data = {
-                'o_id': o_id,
-                'username': request.POST.get('username'),           # 用户名
-                'role_id': request.POST.get('role_id'),             # 角色ID
-                'oper_user_id': request.GET.get('user_id'),         # 操作人
-                'set_avator': request.POST.get('set_avator'),       # 头像
-                'phone': request.POST.get('phone'),                 # 电话
-            }
+
             forms_obj = UpdateForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
 
                 o_id = forms_obj.cleaned_data['o_id']
                 username = forms_obj.cleaned_data['username']           # 用户名
@@ -174,18 +167,18 @@ def user_oper(request, oper_type, o_id):
                         username=username,
                         role_id=role_id,
                         oper_user_id=oper_user_id,
-                        phone=phone
+                        phone=phone,
+                        set_avator=set_avator
                     )
-                    if set_avator: # 更新头像
-                        objs.update(set_avator=set_avator)
 
                     response.code = 200
                     response.msg = "修改成功"
+
                 else:
                     response.code = 303
                     response.msg = '修改ID不存在'
+
             else:
-                print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 

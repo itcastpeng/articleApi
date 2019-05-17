@@ -3,8 +3,8 @@ from article_api.publicFunc import Response
 from article_api.publicFunc import account
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-import time
-import datetime
+from article_api.publicFunc import public
+import datetime, time
 
 
 
@@ -29,7 +29,7 @@ def login(request):
             token = account.get_token(account.str_encrypt(password))
             userprofile_obj.token = token
         else:
-
+            public.record_user_last_login_time(user_id=userprofile_obj.id)
             response.code = 200
             response.msg = '登录成功'
             time.time()
