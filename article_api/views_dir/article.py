@@ -160,26 +160,22 @@ def article_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = '文章未找到'
             else:
-                if objs[0].belongToUser_id == user_id:
-                    if int(objs[0].is_send) != 0:
-                        response.code = 301
-                        response.msg = '该文章已上传, 如有疑问请联系管理员'
-                    else:
-                        if int(objs[0].stop_upload) == 0:
-                            objs.update(
-                                stop_upload=1
-                            )
-                            msg = '停止发布成功'
-                        else:
-                            objs.update(
-                                stop_upload=0
-                            )
-                            msg = '开始发布成功'
-                        response.code = 200
-                        response.msg = msg
-                else:
+                if int(objs[0].is_send) != 0:
                     response.code = 301
-                    response.msg = '权限不足'
+                    response.msg = '该文章已上传, 如有疑问请联系管理员'
+                else:
+                    if int(objs[0].stop_upload) == 0:
+                        objs.update(
+                            stop_upload=1
+                        )
+                        msg = '停止发布成功'
+                    else:
+                        objs.update(
+                            stop_upload=0
+                        )
+                        msg = '开始发布成功'
+                    response.code = 200
+                    response.msg = msg
 
         else:
             response.code = 402

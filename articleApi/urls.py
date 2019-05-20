@@ -15,15 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import url
 from article_api.views_dir import login, user, permissions, role, settlement_rules, article, celery_views, \
-    classfiy
+    classfiy, data_statistics
 
 urlpatterns = [
+
+    url(r'^data_statistics$', data_statistics.data_statistics),
 
     # 账号密码登录
     url(r'^login$', login.login),
 
     # 用户
     url(r'^user/(?P<oper_type>\w+)/(?P<o_id>\d+)$', user.user_oper),
+    url(r'^updatePwd$', user.updatePwd),
     url(r'^user$', user.user),
 
     # 权限管理
@@ -47,8 +50,8 @@ urlpatterns = [
     # url(r'^settlement_rules', settlement_rules.settlement_rules),
 
     # celery 执行视图
-    url(r'^send_article$', celery_views.send_article),  # 上传文章
-    url(r'^article_read_detail$', celery_views.article_read_detail),  # 获取文章阅读情况
+    # url(r'^send_article$', celery_views.send_article),  # 上传文章
+    # url(r'^article_read_detail$', celery_views.article_read_detail),  # 获取文章阅读情况
 ]
 
 

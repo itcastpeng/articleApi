@@ -215,6 +215,18 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = '无此用户'
 
+        # 获取用户信息
+        elif oper_type == 'get_user_info':
+            obj = models.userprofile.objects.get(id=user_id)
+
+            response.code = 200
+            response.msg = '查询个人信息成功'
+            response.data = {
+                'set_avator': obj.set_avator,
+                'username': obj.username,
+                'role_id': obj.role_id,
+            }
+
         else:
             response.code = 402
             response.msg = "请求异常"
