@@ -19,7 +19,8 @@ from article_api.views_dir import login, user, permissions, role, settlement_rul
 
 urlpatterns = [
 
-    url(r'^data_statistics$', data_statistics.data_statistics),
+    # 数据统计
+    url(r'^data_statistics/(?P<oper_type>\w+)$', data_statistics.data_statistics),
 
     # 账号密码登录
     url(r'^login$', login.login),
