@@ -100,6 +100,19 @@ def permissions(request):
                 'ret_data': ret_data,
                 'data_count': count,
             }
+            response.note = {
+                'ret_data': {
+                    'id': '权限ID',
+                    'name': '权限名字',
+                    'title': '权限路径',
+                    'pid_id': '权限父级ID',
+                    'pid_name': '权限父级名称',
+                    'oper_user_id': '操作人ID',
+                    'oper_user__username': '操作人',
+                    'create_date': '创建时间',
+                },
+                'data_count': '数据总数',
+            }
         else:
             response.code = 301
             response.data = json.loads(forms_obj.errors.as_json())
