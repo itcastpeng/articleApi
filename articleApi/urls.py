@@ -31,8 +31,8 @@ urlpatterns = [
     url(r'^user$', user.user),
 
     # 权限管理
-    # url(r'^permissions/(?P<oper_type>\w+)/(?P<o_id>\d+)$', permissions.permissions_oper),
-    # url(r'^permissions$', permissions.permissions),
+    url(r'^permissions/(?P<oper_type>\w+)/(?P<o_id>\d+)$', permissions.permissions_oper),
+    url(r'^permissions$', permissions.permissions),
 
     # 角色管理
     url(r'^role/(?P<oper_type>\w+)/(?P<o_id>\d+)$', role.role_oper),

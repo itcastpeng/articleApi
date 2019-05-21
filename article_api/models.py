@@ -9,13 +9,12 @@ from django.db import models
 
 
 # 权限表
-# class permissions(models.Model):
-#     name = models.CharField(verbose_name="权限名称", max_length=128)
-#     title = models.CharField(verbose_name="权限标题", max_length=128)
-#     pid = models.ForeignKey('self', verbose_name="父级权限", null=True, blank=True)
-#     create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-#     oper_user = models.ForeignKey('userprofile', verbose_name="创建用户", related_name='permissions_user', null=True, blank=True)
-
+class permissions(models.Model):
+    name = models.CharField(verbose_name="权限名称", max_length=128)
+    title = models.CharField(verbose_name="权限标题", max_length=128)
+    pid = models.ForeignKey('self', verbose_name="父级权限", null=True, blank=True)
+    create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    oper_user = models.ForeignKey('userprofile', verbose_name="创建用户", related_name='permissions_user', null=True, blank=True)
 
 
 # 角色表
