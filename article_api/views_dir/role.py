@@ -42,19 +42,14 @@ def role(request):
                 stop_line = start_line + length
                 objs = objs[start_line: stop_line]
 
-            # 返回的数据
             ret_data = []
-
             for obj in objs:
-
-                # 获取选中的id，然后组合成前端能用的数据
-                permissionsData = []
+                permissionsList = []
                 if obj.permissions:
                     permissionsList = [i['id'] for i in obj.permissions.values('id')]
-                    if len(permissionsList) > 0:
-                        permissionsData = init_data(selected_list=permissionsList)
+                    # if len(permissionsList) > 0:
+                    #     permissionsData = init_data(selected_list=permissionsList)
 
-                #  如果有oper_user字段 等于本身名字
                 if obj.oper_user:
                     oper_user_id = obj.oper_user_id
                     oper_user_username = obj.oper_user.username
@@ -62,17 +57,15 @@ def role(request):
                     oper_user_username = ''
                     oper_user_id = ''
 
-                #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
                     'name': obj.name,                           # 角色名称
-                    'permissionsData': permissionsData,         # 角色权限
+                    'permissionsData': permissionsList,         # 角色权限
                     'oper_user_id': oper_user_id,               # 操作人ID
                     'oper_user__username': oper_user_username,  # 操作人
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                 })
 
-            #  查询成功 返回200 状态码
             response.code = 200
             response.msg = '查询成功'
             response.data = {
@@ -103,35 +96,26 @@ def role_oper(request, oper_type, o_id):
                 'name': request.POST.get('name'),                       # 角色名称
                 'permissionsList': request.POST.get('permissionsList'), # 角色权限
             }
-            #  创建 form验证 实例（参数默认转成字典）
+
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-
-                print({
-                    'name': forms_obj.cleaned_data.get('name'),
-                    'oper_user_id': forms_obj.cleaned_data.get('oper_user_id'),
-                })
                 obj = models.role.objects.create(**{
                     'name': forms_obj.cleaned_data.get('name'),
                     'oper_user_id': forms_obj.cleaned_data.get('oper_user_id'),
                 })
-
                 permissionsList = forms_obj.cleaned_data.get('permissionsList')
-                print('permissionsList -->', permissionsList)
                 obj.permissions = permissionsList
                 obj.save()
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'testCase': obj.id}
+
             else:
-                print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
         # 修改角色
         elif oper_type == "update":
-            # 获取需要修改的信息
             form_data = {
                 'o_id': o_id,
                 'name': request.POST.get('name'),                           # 角色名称
@@ -141,42 +125,33 @@ def role_oper(request, oper_type, o_id):
 
             forms_obj = UpdateForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-                print(forms_obj.cleaned_data)
                 o_id = forms_obj.cleaned_data['o_id']
                 name = forms_obj.cleaned_data['name']                           # 角色名称
                 oper_user_id = forms_obj.cleaned_data['oper_user_id']           # 操作人ID
                 permissionsList = forms_obj.cleaned_data['permissionsList']     # 角色权限
-                #  查询数据库  用户id
+
                 objs = models.role.objects.filter(
                     id=o_id
                 )
-                #  更新 数据
                 if objs:
                     objs.update(
                         name=name,
                         oper_user_id=oper_user_id,
                     )
-
                     objs[0].permissions = permissionsList
-
                     response.code = 200
                     response.msg = "修改成功"
+
                 else:
                     response.code = 303
                     response.msg = '不存在的数据'
 
             else:
-                print("验证不通过")
-                # print(forms_obj.errors)
                 response.code = 301
-                # print(forms_obj.errors.as_json())
-                #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
         # 删除角色
         elif oper_type == "delete":
-            # 删除 ID
             objs = models.role.objects.filter(id=o_id)
             if objs:
                 obj = objs[0]
@@ -200,18 +175,15 @@ def role_oper(request, oper_type, o_id):
                 response.msg = '删除ID不存在'
 
     else:
-        # 获取角色对应的权限
-        if oper_type == "get_rules":
 
+        if oper_type == "get_rules":
             objs = models.role.objects.filter(id=o_id)
             if objs:
                 obj = objs[0]
                 rules_list = [i['name'] for i in obj.permissions.values('name')]
-                print('dataList -->', rules_list)
                 response.data = {
                     'rules_list': rules_list
                 }
-
                 response.code = 200
                 response.msg = "查询成功"
 

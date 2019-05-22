@@ -32,7 +32,6 @@ def init_data(pid=None, selected_list=None):
             current_data['children'] = children_data
         result_data.append(current_data)
 
-    # print('result_data -->', result_data)
     return result_data
 
 
@@ -67,9 +66,7 @@ def permissions(request):
                 stop_line = start_line + length
                 objs = objs[start_line: stop_line]
 
-            # 返回的数据
             ret_data = []
-
             for obj in objs:
                 #  如果有oper_user字段 等于本身名字
                 if obj.oper_user:
@@ -78,8 +75,7 @@ def permissions(request):
                 else:
                     oper_user_username = ''
                     oper_user_id = ''
-                # print('oper_user_username -->', oper_user_username)
-                #  将查询出来的数据 加入列表
+
                 pid_name = ''
                 if obj.pid:
                     pid_name = obj.pid.name
@@ -113,6 +109,7 @@ def permissions(request):
                 },
                 'data_count': '数据总数',
             }
+
         else:
             response.code = 301
             response.data = json.loads(forms_obj.errors.as_json())
@@ -139,22 +136,18 @@ def permissions_oper(request, oper_type, o_id):
                 'title': request.POST.get('title'),         # 权限路径
                 'pid_id': request.POST.get('pid_id'),       # 权限父级ID
             }
-            #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-                #  添加数据库
                 models.permissions.objects.create(**forms_obj.cleaned_data)
                 response.code = 200
                 response.msg = "添加成功"
+
             else:
-                print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
         # 修改权限
         elif oper_type == "update":
-            # 获取需要修改的信息
             form_data = {
                 'o_id': o_id,
                 'name': request.POST.get('name'),               # 权限名称
@@ -165,14 +158,11 @@ def permissions_oper(request, oper_type, o_id):
 
             forms_obj = UpdateForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-
                 o_id = forms_obj.cleaned_data['o_id']
                 name = forms_obj.cleaned_data['name']                   # 权限名称
                 title = forms_obj.cleaned_data['title']                 # 权限路由
                 pid_id = forms_obj.cleaned_data['pid_id']               # 权限父级ID
                 oper_user_id = forms_obj.cleaned_data['oper_user_id']   # 操作人ID
-
                 models.permissions.objects.filter(id=o_id).update(
                     name=name,
                     title=title,
@@ -183,7 +173,6 @@ def permissions_oper(request, oper_type, o_id):
                 response.msg = "修改成功"
 
             else:
-                print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
@@ -195,6 +184,7 @@ def permissions_oper(request, oper_type, o_id):
                 if models.permissions.objects.filter(pid_id=obj.id).count() > 0:
                     response.code = 304
                     response.msg = "含有子级数据,请先删除或转移子级数据"
+
                 else:
                     objs.delete()
                     response.code = 200
