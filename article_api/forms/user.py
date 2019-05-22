@@ -1,10 +1,10 @@
 from django import forms
-
 from article_api import models
 from article_api.publicFunc import account
 import time
+from article_api.publicFunc.public import verify_mobile_phone_number
 
-import re
+
 # 普通用户添加
 class AddForm(forms.Form):
     oper_user_id = forms.IntegerField(
@@ -88,12 +88,11 @@ class AddForm(forms.Form):
     def clean_phone(self):
         phone = self.data.get('phone')
         if phone:
-            phone_pat = re.compile('^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$')
-            res = re.search(phone_pat, phone)
-            if res:
+            if verify_mobile_phone_number(phone):
                 return phone
             else:
                 self.add_error('phone', '请输入正确手机号')
+
 # 更新
 class UpdateForm(forms.Form):
     o_id = forms.IntegerField(
@@ -169,12 +168,11 @@ class UpdateForm(forms.Form):
     def clean_phone(self):
         phone = self.data.get('phone')
         if phone:
-            phone_pat = re.compile('^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$')
-            res = re.search(phone_pat, phone)
-            if res:
+            if verify_mobile_phone_number(phone):
                 return phone
             else:
                 self.add_error('phone', '请输入正确手机号')
+
 
 # 判断是否是数字
 class SelectForm(forms.Form):

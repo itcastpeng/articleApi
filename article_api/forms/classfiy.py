@@ -100,7 +100,10 @@ class UpdateForm(forms.Form):
         parent_class = self.data.get('parent_class')
         objs = models.classfiy.objects.filter(id=o_id)
         if objs:
-            flag = public.UpdateClassfiyGroupTree(o_id, parent_class)
+
+            flag = public.UpdateClassfiyGroupTree(o_id)
+            if parent_class:
+                flag = public.UpdateClassfiyGroupTree(o_id, parent_class)
 
             if flag:
                 self.add_error('o_id', '不能放在此分类下')

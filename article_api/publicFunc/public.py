@@ -1,6 +1,6 @@
 from django.db.models import Q
 from article_api import models
-import datetime
+import datetime, re
 
 # 记录用户最后登录时间
 def record_user_last_login_time(user_id):
@@ -30,10 +30,11 @@ def GroupTree(parent_class_id=None):
 
 
 # 修改分类 判断是否死循环
-def UpdateClassfiyGroupTree(o_id, parent_class_id):
+def UpdateClassfiyGroupTree(o_id, parent_class_id=None):
     flag = False
     q = Q()
     q.add(Q(id=parent_class_id), Q.AND)
+    print('q-----------> ', q)
     objs = models.classfiy.objects.filter(q)
     for obj in objs:
         if obj.parent_class:
@@ -113,6 +114,14 @@ def time_screen(number_days):
     return data
 
 
+def verify_mobile_phone_number(phone):
+    flag = False
+    phone_pat = re.compile('^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$')
+    res = re.search(phone_pat, phone)
+    if res:
+        flag = True
+
+    return flag
 
 
 
