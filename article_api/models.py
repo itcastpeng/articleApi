@@ -22,7 +22,7 @@ class role(models.Model):
     name = models.CharField(verbose_name="角色名称", max_length=128)
     create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     oper_user = models.ForeignKey('userprofile', verbose_name="创建用户", related_name='role_user', null=True, blank=True)
-    # permissions = models.ManyToManyField('permissions', verbose_name="拥有权限")
+    permissions = models.ManyToManyField('permissions', verbose_name="拥有权限")
 
 # 用户表
 class userprofile(models.Model):
