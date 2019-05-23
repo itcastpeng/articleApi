@@ -95,7 +95,7 @@ def article_oper(request, oper_type, o_id):
             'summary': request.POST.get('summary'),                 # 文章摘要
             'article_cover': request.POST.get('article_cover'),     # 文章封面图片
             'content': request.POST.get('content'),                 # 文章内容
-
+            'article_word_count':request.POST.get('article_word_count', 0), # 文章字数
             'edit_name': request.POST.get('edit_name'),             # 编辑别名
             'article_source': request.POST.get('article_source'),   # 文章来源
         }
@@ -129,6 +129,7 @@ def article_oper(request, oper_type, o_id):
                     'article_source':forms_obj.cleaned_data.get('article_source'),# 文章来源
                     'article_cover':forms_obj.cleaned_data.get('article_cover'),      # 文章缩略图
                     'edit_name':forms_obj.cleaned_data.get('edit_name'),        # 编辑别名
+                    'article_word_count':forms_obj.cleaned_data.get('article_word_count'), # 文章字数
                 })
 
                 obj[0].classfiy = json.loads(classfiy_list)

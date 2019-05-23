@@ -50,7 +50,12 @@ class AddForm(forms.Form):
             'required': "亲, 请写文章编辑人别名!"
         }
     )
-
+    article_word_count= forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "文章字数不能为空"
+        }
+    )
     # 查询名称是否存在
     def clean_title(self):
         title = self.data['title']
@@ -124,7 +129,12 @@ class UpdateForm(forms.Form):
             'required': "亲, 请写文章编辑人别名!"
         }
     )
-
+    article_word_count = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "文章字数不能为空"
+        }
+    )
     # 查询名称是否存在
     def clean_title(self):
         title = self.data.get('title')

@@ -36,7 +36,7 @@ urlpatterns = [
 
     # 角色管理
     url(r'^role/(?P<oper_type>\w+)/(?P<o_id>\d+)$', role.role_oper),
-    url(r'^role', role.role),
+    url(r'^role$', role.role),
 
     # 分类管理
     url(r'^classfiy/(?P<oper_type>\w+)/(?P<o_id>\d+)$', classfiy.classfiy_oper),
