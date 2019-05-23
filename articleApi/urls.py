@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from article_api.views_dir import login, user, permissions, role, settlement_rules, article, celery_views, \
-    classfiy, data_statistics
+    classfiy, data_statistics, qiniu_oper
 
 urlpatterns = [
 
@@ -45,6 +45,10 @@ urlpatterns = [
     # 文章管理
     url(r'^article/(?P<oper_type>\w+)/(?P<o_id>\d+)$', article.article_oper),
     url(r'^article$', article.article),
+
+    # 七牛云
+    url(r'^qiniu/(?P<oper_type>\w+)$', qiniu_oper.qiniu_oper),
+
 
     # 结算管理
     # url(r'^settlement_rules/(?P<oper_type>\w+)/(?P<o_id>\d+)$', settlement_rules.settlement_rules_oper),

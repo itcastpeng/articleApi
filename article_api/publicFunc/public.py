@@ -113,7 +113,7 @@ def time_screen(number_days):
 
     return data
 
-
+# 验证手机号
 def verify_mobile_phone_number(phone):
     flag = False
     phone_pat = re.compile('^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$')

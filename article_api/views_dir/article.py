@@ -20,7 +20,6 @@ def article(request):
 
             order = request.GET.get('order', '-create_date')
             field_dict = {
-                'id': '',
                 'name': '__contains',
                 'create_date': '',
                 'oper_user__username': '__contains',
@@ -36,21 +35,24 @@ def article(request):
                 objs = objs[start_line: stop_line]
 
             ret_data = []
+            id = request.GET.get('id')
             for obj in objs:
-
-                ret_data.append({
+                result_data = {
                     'id': obj.id,
-                    'title': obj.title,                                             # 文章标题
-                    'summary': obj.summary,                                         # 文章摘要
-                    'content': obj.content,                                         # 文章内容
+                    'title': obj.title,  # 文章标题
+                    'summary': obj.summary,  # 文章摘要
                     'article_cover': obj.article_cover,                             # 文章封面图
                     'edit_name': obj.edit_name,                                     # 作者别名
                     'article_source_id': obj.article_source,                        # 文章来源ID
                     'article_source': obj.get_article_source_display(),             # 文章来源
                     'stop_upload': obj.stop_upload,                                 # 是否停止发布
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),   # 文章创建时间
-                })
+                }
 
+                if id:
+                    result_data['content']=obj.content                              # 文章内容
+
+                ret_data.append(result_data)
 
             article_source = []
             for i in models.article.article_source_choices:
@@ -71,6 +73,7 @@ def article(request):
         else:
             response.code = 301
             response.data = json.loads(forms_obj.errors.as_json())
+
     else:
         response.code = 402
         response.msg = "请求异常"
