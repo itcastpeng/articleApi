@@ -38,6 +38,7 @@ def article(request):
             ret_data = []
             id = request.GET.get('id')
             for obj in objs:
+                classfiy_list = [i.id for i in obj.classfiy.all()]
                 result_data = {
                     'id': obj.id,
                     'title': obj.title,  # 文章标题
@@ -47,6 +48,7 @@ def article(request):
                     'article_source_id': obj.article_source,                        # 文章来源ID
                     'article_source': obj.get_article_source_display(),             # 文章来源
                     'stop_upload': obj.stop_upload,                                 # 是否停止发布
+                    'classfiy_list': classfiy_list,                   # 文章字数
                     'article_word_count': obj.article_word_count,                   # 文章字数
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),   # 文章创建时间
                 }
