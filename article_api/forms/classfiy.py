@@ -98,21 +98,24 @@ class UpdateForm(forms.Form):
     def clean_o_id(self):
         o_id = self.data.get('o_id')
         parent_class = self.data.get('parent_class')
-        objs = models.classfiy.objects.filter(id=o_id)
-        if objs:
+        if o_id != parent_class:
+            objs = models.classfiy.objects.filter(id=o_id)
+            if objs:
 
-            flag = public.UpdateClassfiyGroupTree(o_id)
-            if parent_class:
-                flag = public.UpdateClassfiyGroupTree(o_id, parent_class)
+                flag = public.UpdateClassfiyGroupTree(o_id)
+                if parent_class:
+                    flag = public.UpdateClassfiyGroupTree(o_id, parent_class)
 
-            if flag:
-                self.add_error('o_id', '不能放在此分类下')
+                if flag:
+                    self.add_error('o_id', '不能放在此分类下')
+
+                else:
+                    return o_id, objs
 
             else:
-                return o_id, objs
-
+                self.add_error('o_id', '修改分类不存在')
         else:
-            self.add_error('o_id', '修改分类不存在')
+            self.add_error('o_id', '父级不能设置为自己')
 
 # 判断是否是数字
 class SelectForm(forms.Form):
