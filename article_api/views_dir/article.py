@@ -20,6 +20,7 @@ def article(request):
 
             order = request.GET.get('order', '-create_date')
             field_dict = {
+                'id': '',
                 'name': '__contains',
                 'create_date': '',
                 'oper_user__username': '__contains',
