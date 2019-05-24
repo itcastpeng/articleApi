@@ -22,7 +22,7 @@ def article(request):
             field_dict = {
                 'id': '',
                 'title': '__contains',
-                'create_date': '',
+                'create_date': '__contains',
                 'article_source': '',
                 'oper_user__username': '__contains',
             }
