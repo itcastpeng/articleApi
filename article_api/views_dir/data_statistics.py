@@ -35,7 +35,9 @@ def data_statistics(request, oper_type):
 
         ret_data = []
         for data in data_list:
-            avg = (data.get('classify_count') / article_count) * 100 # 百分比
+            avg = 0
+            if article_count:
+                avg = (data.get('classify_count') / article_count) * 100 # 百分比
 
             ret_data.append({
                 'classify_id': data.get('classify_id'),
