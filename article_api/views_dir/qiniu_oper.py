@@ -26,12 +26,16 @@ def qiniu_oper(request, oper_type):
 
 # 发送报错提醒
 def error_send_msg(request):
+    response = Response.ResponseObj()
     msg = request.GET.get('msg')
     if msg:
         url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/outside_calls_send_msg?msg={}&external=1'.format(msg)
         # url = 'http://127.0.0.1:8008/tianyan/api/outside_calls_send_msg?msg={}&external=1'.format(msg)
         requests.get(url)
-    return HttpResponse('已发送 错误消息')
+
+    response.code = 200
+    response.msg = '已发送错误消息'
+    return JsonResponse(response.__dict__)
 
 
 
