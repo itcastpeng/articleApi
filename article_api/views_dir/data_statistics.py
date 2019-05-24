@@ -40,7 +40,7 @@ def data_statistics(request, oper_type):
             ret_data.append({
                 'classify_id': data.get('classify_id'),
                 'classify_name': data.get('classify_name'),
-                'avg': str(avg) + '%',
+                'avg': avg,
             })
 
 
