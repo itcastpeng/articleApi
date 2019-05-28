@@ -8,7 +8,6 @@ def record_user_last_login_time(user_id):
     objs = models.userprofile.objects.filter(id=user_id)
     objs.update(last_login_time=now)
 
-
 # 分组树状图
 def GroupTree(parent_class_id=None):
     result_data = []
@@ -28,7 +27,6 @@ def GroupTree(parent_class_id=None):
 
     return result_data
 
-
 # 修改分类 判断是否死循环
 def UpdateClassfiyGroupTree(o_id, parent_class_id=None):
     flag = False
@@ -46,9 +44,6 @@ def UpdateClassfiyGroupTree(o_id, parent_class_id=None):
         else:
             return False
     return flag
-
-
-
 
 # 数据统计 查询 该分类下所有文章
 def data_statistics_get_article(num, o_id):
@@ -72,9 +67,6 @@ def data_statistics_get_article(num, o_id):
     #     current_data['children'] = children_data
     #     result_data.append(current_data)
     return num
-
-
-
 
 # 时间筛选
 def time_screen(number_days):
@@ -123,7 +115,15 @@ def verify_mobile_phone_number(phone):
 
     return flag
 
+# 判断分类 级别
+def judgment_classification_level(parent, num):
+    # print('num----============> ', num)
+    objs = models.classfiy.objects.filter(id=parent)
+    if objs:
+        num += 1
+        num = judgment_classification_level(objs[0].parent_class_id, num)
 
+    return num
 
 
 

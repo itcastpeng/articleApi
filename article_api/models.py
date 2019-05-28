@@ -50,7 +50,7 @@ class classfiy(models.Model):
     classify_name = models.CharField(verbose_name='分类名称', max_length=64, null=True, blank=True)
     number_articles = models.IntegerField(verbose_name='该分类下存在文章个数', default=0)
     create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-
+    level = models.IntegerField(verbose_name='分类等级', default=1)
 
 # 文章表
 class article(models.Model):

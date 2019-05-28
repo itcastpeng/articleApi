@@ -26,6 +26,7 @@ def classfiy(request):
 
             field_dict = {
                 'id': '',
+                'level': '',
                 'classify_name': '__contains',
                 'parent_class_id': '',
                 'oper_user_id': '',
@@ -57,6 +58,7 @@ def classfiy(request):
                     'name': obj.classify_name,                          # 分类名称
                     'parent_id': parent_id,                             # 父级ID
                     'parent_name': parent_name,                         # 父级分类名称
+                    'level': obj.level,                         # 父级分类名称
                     'oper_user_id': obj.oper_user_id,                   # 操作人ID
                     'oper_user__username': obj.oper_user.username,      # 操作人
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
@@ -69,6 +71,7 @@ def classfiy(request):
                 'ret_data': ret_data,
                 'data_count': count,
             }
+
         else:
             response.code = 402
             response.msg = "请求异常"
@@ -102,11 +105,16 @@ def classfiy_oper(request, oper_type, o_id):
                 form_clean_data = forms_obj.cleaned_data
                 oper_user_id = form_clean_data.get('oper_user_id')
                 classify_name = form_clean_data.get('classify_name')
-                parent_class = form_clean_data.get('parent_class')
+                parent_class = ''
+                num = 1
+                if form_clean_data.get('parent_class'):
+                    parent_class, num = form_clean_data.get('parent_class')
+
                 models.classfiy.objects.create(
                     oper_user_id=oper_user_id,
                     classify_name=classify_name,
-                    parent_class_id=parent_class
+                    parent_class_id=parent_class,
+                    level=num
                 )
 
                 response.code = 200

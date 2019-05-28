@@ -2,7 +2,7 @@ from django import forms
 
 from article_api import models
 from article_api.publicFunc import public
-
+from article_api.publicFunc.public import judgment_classification_level
 
 # 添加
 class AddForm(forms.Form):
@@ -42,7 +42,13 @@ class AddForm(forms.Form):
         if parent_class:
             parent_class_objs = models.classfiy.objects.filter(id=parent_class)
             if parent_class_objs:
-                return parent_class
+                classifiy_level = judgment_classification_level(parent_class, num=0) # 判断父级分类等级
+
+                if classifiy_level <= 2:
+                    classifiy_level += 1   # 当前添加的分类等级
+                    return parent_class, classifiy_level
+                else:
+                    self.add_error('parent_class', '分类超过三级')
             else:
                 self.add_error('parent_class', '父级分类不存在')
 
@@ -91,7 +97,15 @@ class UpdateForm(forms.Form):
         if parent_class:
             parent_class_objs = models.classfiy.objects.filter(id=parent_class)
             if parent_class_objs:
-                return parent_class
+
+                classifiy_level = judgment_classification_level(parent_class, num=0)  # 判断父级分类等级
+
+                if classifiy_level <= 2:
+                    classifiy_level += 1  # 当前添加的分类等级
+                    return parent_class, classifiy_level
+
+                else:
+                    self.add_error('parent_class', '分类超过三级')
             else:
                 self.add_error('parent_class', '父级分类不存在')
 
