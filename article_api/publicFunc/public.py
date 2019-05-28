@@ -125,9 +125,15 @@ def judgment_classification_level(parent, num):
 
     return num
 
-
-
-
+# 添加修改文章 判断选择的分类 是否为最低级
+def Classification_judgment(classify_list):
+    objs = models.classfiy.objects.filter(id__in=classify_list)
+    flag = False
+    for obj in objs:
+        if obj.level != 3:
+            flag = True
+            break
+    return flag
 
 
 

@@ -3,8 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from article_api.publicFunc.condition_com import conditionCom
 from article_api.forms.article import AddForm, UpdateForm, SelectForm, DeleteForm
-from article_api.publicFunc import Response
-from article_api.publicFunc import account
+from article_api.publicFunc import Response, account
+from article_api.publicFunc.public import Classification_judgment
 import json, datetime, requests, time
 
 # cerf  token验证 用户展示模块
@@ -111,12 +111,20 @@ def article_oper(request, oper_type, o_id):
         if oper_type == "add":
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                obj = models.article.objects.create(**forms_obj.cleaned_data)
-                obj.classfiy = json.loads(classfiy_list)
-                obj.save()
 
-                response.code = 200
-                response.msg = "添加成功"
+                classfiy_list = json.loads(classfiy_list)
+                flag = Classification_judgment(classfiy_list)
+
+                if flag:
+                    response.code = 301
+                    response.msg = '请选择三级分类'
+
+                else:
+                    obj = models.article.objects.create(**forms_obj.cleaned_data)
+                    obj.classfiy = classfiy_list
+                    obj.save()
+                    response.code = 200
+                    response.msg = "添加成功"
 
             else:
                 response.code = 301
