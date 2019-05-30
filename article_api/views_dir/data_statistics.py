@@ -1,12 +1,20 @@
-from django.http import HttpResponse, JsonResponse
 from article_api.publicFunc.Response import ResponseObj
-from article_api import models
 from article_api.publicFunc.public import data_statistics_get_article, time_screen
+from article_api import models
+from article_api.publicFunc import Response, account
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from article_api.publicFunc.public import record_user_last_login_time
 
 
 # 首页数据统计
+@csrf_exempt
+@account.is_token(models.userprofile)
 def data_statistics(request, oper_type):
     res = ResponseObj()
+
+    user_id = request.GET.get('user_id')
+    record_user_last_login_time(user_id)
 
     # 文章分类占比
     if oper_type == 'article_classify_account':
