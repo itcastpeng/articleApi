@@ -53,7 +53,7 @@ def user(request):
                 'oper_user_id': obj.oper_user_id,                   # 操作人ID
                 'status': obj.status,                               # 用户状态ID
                 'get_status_display': obj.get_status_display(),     # 用户状态 (审核, 未审核)
-                'set_avator': obj.set_avator,                       # 头像
+                # 'set_avator': obj.set_avator,                       # 头像
                 'phone': obj.phone,                                 # 电话
                 'last_login_time': last_login_time,                 # 最后一次登录时间
                 'create_time': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
@@ -126,7 +126,7 @@ def user_oper(request, oper_type, o_id):
             'username': request.POST.get('username'),  # 用户名
             'role_id': request.POST.get('role_id'),  # 角色ID
             'oper_user_id': request.GET.get('user_id'),  # 操作人
-            'set_avator': request.POST.get('set_avator'),  # 头像
+            # 'set_avator': request.POST.get('set_avator'),  # 头像
             'phone': request.POST.get('phone'),  # 电话
             'password': request.POST.get('password'),  # 密码
         }
@@ -155,7 +155,7 @@ def user_oper(request, oper_type, o_id):
                 username = forms_obj.cleaned_data['username']           # 用户名
                 role_id = forms_obj.cleaned_data['role_id']             # 角色ID
                 oper_user_id = forms_obj.cleaned_data['oper_user_id']   # 操作人
-                set_avator = forms_obj.cleaned_data['set_avator']       # 头像
+                # set_avator = forms_obj.cleaned_data['set_avator']       # 头像
                 phone = forms_obj.cleaned_data['phone']                 # 电话
 
                 objs = models.userprofile.objects.filter(
@@ -168,7 +168,7 @@ def user_oper(request, oper_type, o_id):
                         role_id=role_id,
                         oper_user_id=oper_user_id,
                         phone=phone,
-                        set_avator=set_avator
+                        # set_avator=set_avator
                     )
 
                     response.code = 200
@@ -222,7 +222,7 @@ def user_oper(request, oper_type, o_id):
             response.code = 200
             response.msg = '查询个人信息成功'
             response.data = {
-                'set_avator': obj.set_avator,
+                # 'set_avator': obj.set_avator,
                 'username': obj.username,
                 'role_id': obj.role_id,
             }

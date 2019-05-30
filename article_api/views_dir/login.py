@@ -37,7 +37,7 @@ def login(request):
             response.data = {
                 'token': token,
                 'user_id': userprofile_obj.id,
-                'set_avator': userprofile_obj.set_avator,
+                # 'set_avator': userprofile_obj.set_avator,
                 'username':userprofile_obj.username,
                 'role_id': userprofile_obj.role_id,
             }
