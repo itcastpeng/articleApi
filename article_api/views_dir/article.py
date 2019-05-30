@@ -55,7 +55,7 @@ def article(request):
                 }
 
                 if id:
-                    result_data['content'] = obj.content                            # 文章内容
+                    result_data['content'] = obj.content                             # 文章内容
                     class_list = []
                     class_list = query_classification_supervisor(classfiy_id, class_list)
 
