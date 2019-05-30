@@ -35,7 +35,7 @@ def classfiy(request):
             print('q -->', q)
 
 
-            objs = models.classfiy.objects.filter(oper_user__isnull=False)
+            objs = models.classfiy.objects.filter(q, oper_user__isnull=False)
             count = objs.count()
 
             if length != 0:
