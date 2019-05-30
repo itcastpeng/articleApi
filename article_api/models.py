@@ -39,7 +39,7 @@ class userprofile(models.Model):
 
     last_login_time = models.DateTimeField(verbose_name='最后登录时间', null=True)
     role = models.ForeignKey('role', verbose_name='所属角色', null=True)
-    set_avator = models.CharField(verbose_name='头像', default='http://api.zhugeyingxiao.com/statics/imgs/setAvator.jpg', max_length=128)
+    # set_avator = models.CharField(verbose_name='头像', default='http://api.zhugeyingxiao.com/statics/imgs/setAvator.jpg', max_length=128)
     phone = models.CharField(verbose_name='电话', max_length=16, null=True, blank=True)
     the_amount_of = models.IntegerField(verbose_name='金额(元)', default=0)
 
