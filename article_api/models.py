@@ -67,16 +67,10 @@ class article(models.Model):
     )
     article_source = models.SmallIntegerField(verbose_name='文章来源', choices=article_source_choices, default=1)
     is_send = models.IntegerField(verbose_name='是否上传', default=0)
-
     edit_name = models.CharField(verbose_name='编辑名称', max_length=16)
     stop_upload = models.IntegerField(verbose_name='停止/恢复上传', default=0)
-    classfiy = models.ManyToManyField(classfiy, verbose_name='类别')
-
+    classfiy = models.ForeignKey('classfiy', verbose_name='类别')
     article_word_count = models.IntegerField(verbose_name='文章字数', null=True)
-    # leida_article_id = models.IntegerField(verbose_name='服务器ID', null=True, blank=True)
-    # last_query_time = models.DateTimeField(verbose_name='上次查询时间(设置隔多久查询一次)', null=True, blank=True)
-    # billing_price = models.CharField(verbose_name='计费总价', max_length=256, default=0)
-    # price_paid = models.CharField(verbose_name='已付价格', max_length=256, default=0)
 
 # 计费结算日志
 class billing_log(models.Model):

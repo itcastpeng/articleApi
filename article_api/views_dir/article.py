@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from article_api.publicFunc.condition_com import conditionCom
 from article_api.forms.article import AddForm, UpdateForm, SelectForm, DeleteForm
 from article_api.publicFunc import Response, account
-from article_api.publicFunc.public import Classification_judgment
+from article_api.publicFunc.public import Classification_judgment, query_classification_supervisor
 import json, datetime, requests, time
 
 # cerf  token验证 用户展示模块
@@ -39,7 +39,7 @@ def article(request):
             ret_data = []
             id = request.GET.get('id')
             for obj in objs:
-                classfiy_list = [i.id for i in obj.classfiy.all()]
+                classfiy_id = obj.classfiy_id
                 result_data = {
                     'id': obj.id,
                     'title': obj.title,  # 文章标题
@@ -49,13 +49,17 @@ def article(request):
                     'article_source_id': obj.article_source,                        # 文章来源ID
                     'article_source': obj.get_article_source_display(),             # 文章来源
                     'stop_upload': obj.stop_upload,                                 # 是否停止发布
-                    'classfiy_list': classfiy_list,                   # 文章字数
+                    'classfiy_id': classfiy_id,                                     # 文章字数
                     'article_word_count': obj.article_word_count,                   # 文章字数
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),   # 文章创建时间
                 }
 
                 if id:
-                    result_data['content']=obj.content                              # 文章内容
+                    result_data['content'] = obj.content                            # 文章内容
+                    class_list = []
+                    class_list = query_classification_supervisor(classfiy_id, class_list)
+
+                    result_data['classfiy_list'] = class_list                       # 分类所有等级
 
                 ret_data.append(result_data)
 
@@ -103,28 +107,17 @@ def article_oper(request, oper_type, o_id):
             'article_word_count':request.POST.get('article_word_count', 0), # 文章字数
             'edit_name': request.POST.get('edit_name'),             # 编辑别名
             'article_source': request.POST.get('article_source'),   # 文章来源
+            'classfiy_id': request.POST.get('classfiy_id')   # 类别
         }
 
-        classfiy_list = request.POST.get('classfiy_list', [])  # 类别
 
         # 添加文章
         if oper_type == "add":
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-
-                classfiy_list = json.loads(classfiy_list)
-                flag = Classification_judgment(classfiy_list)
-
-                if flag:
-                    response.code = 301
-                    response.msg = '请选择三级分类'
-
-                else:
-                    obj = models.article.objects.create(**forms_obj.cleaned_data)
-                    obj.classfiy = classfiy_list
-                    obj.save()
-                    response.code = 200
-                    response.msg = "添加成功"
+                obj = models.article.objects.create(**forms_obj.cleaned_data)
+                response.code = 200
+                response.msg = "添加成功"
 
             else:
                 response.code = 301
@@ -141,12 +134,10 @@ def article_oper(request, oper_type, o_id):
                     'content':forms_obj.cleaned_data.get('content'),
                     'article_source':forms_obj.cleaned_data.get('article_source'),# 文章来源
                     'article_cover':forms_obj.cleaned_data.get('article_cover'),      # 文章缩略图
-                    'edit_name':forms_obj.cleaned_data.get('edit_name'),        # 编辑别名
+                    'edit_name':forms_obj.cleaned_data.get('edit_name'),                # 编辑别名
                     'article_word_count':forms_obj.cleaned_data.get('article_word_count'), # 文章字数
+                    'classfiy_id':forms_obj.cleaned_data.get('classfiy_id'),            # 文章字数
                 })
-
-                obj[0].classfiy = json.loads(classfiy_list)
-                obj[0].save()
 
                 response.code = 200
                 response.msg = '修改成功'

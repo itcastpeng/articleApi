@@ -2,7 +2,7 @@ from django import forms
 
 from article_api import models
 import json
-
+from article_api.publicFunc.public import Classification_judgment
 
 # 添加
 class AddForm(forms.Form):
@@ -56,6 +56,21 @@ class AddForm(forms.Form):
             'required': "文章字数不能为空"
         }
     )
+    classfiy_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "分类不能为空"
+        }
+    )
+
+    def clean_classfiy_id(self):
+        classfiy_id = self.data.get('classfiy_id')
+        flag = Classification_judgment(classfiy_id)
+        if flag:
+            self.add_error('classfiy_id', '请选择三级分类')
+        else:
+            return classfiy_id
+
     # 查询名称是否存在
     def clean_title(self):
         title = self.data['title']
@@ -89,6 +104,12 @@ class UpdateForm(forms.Form):
         required=True,
         error_messages={
             'required': "文章标题不能为空"
+        }
+    )
+    classfiy_id = forms.CharField(
+        required=True,
+        error_messages={
+            'required': "分类不能为空"
         }
     )
     summary = forms.CharField(
@@ -167,6 +188,13 @@ class UpdateForm(forms.Form):
         else:
             self.add_error('o_id', '亲, 数据丢了~')
 
+    def clean_classfiy_id(self):
+        classfiy_id = self.data.get('classfiy_id')
+        flag = Classification_judgment(classfiy_id)
+        if flag:
+            self.add_error('classfiy_id', '请选择三级分类')
+        else:
+            return classfiy_id
 
 # 删除
 class DeleteForm(forms.Form):

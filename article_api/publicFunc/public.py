@@ -127,13 +127,52 @@ def judgment_classification_level(parent, num):
 
 # 添加修改文章 判断选择的分类 是否为最低级
 def Classification_judgment(classify_list):
-    objs = models.classfiy.objects.filter(id__in=classify_list)
+    objs = models.classfiy.objects.filter(id=classify_list)
     flag = False
     for obj in objs:
         if obj.level != 3:
             flag = True
             break
     return flag
+
+# 查询 分类所有上级
+def query_classification_supervisor(classify_id, class_list):
+    obj = models.classfiy.objects.get(id=classify_id)
+    print('obj.parent_class_id------------>', obj.parent_class_id)
+    if obj.parent_class_id:
+        class_list.append({
+            'level':obj.level,
+            'id':obj.id
+        })
+        class_list = query_classification_supervisor(obj.parent_class_id, class_list)
+    else:
+        class_list.append({
+            'level': obj.level,
+            'id': obj.id
+        })
+    return class_list
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
