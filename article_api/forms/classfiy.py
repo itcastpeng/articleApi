@@ -26,16 +26,16 @@ class AddForm(forms.Form):
         }
     )
 
-    # 查询名称是否存在
-    def clean_classify_name(self):
-        classify_name = self.data.get('classify_name')
-        objs = models.classfiy.objects.filter(
-            classify_name=classify_name,
-        )
-        if objs:
-            self.add_error('classify_name', '分类名称已存在')
-        else:
-            return classify_name
+    # # 查询名称是否存在
+    # def clean_classify_name(self):
+    #     classify_name = self.data.get('classify_name')
+    #     objs = models.classfiy.objects.filter(
+    #         classify_name=classify_name,
+    #     )
+    #     if objs:
+    #         self.add_error('classify_name', '分类名称已存在')
+    #     else:
+    #         return classify_name
 
     def clean_parent_class(self):
         parent_class = self.data.get('parent_class')
