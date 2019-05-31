@@ -54,7 +54,7 @@ def classfiy(request):
                     parent_id = obj.parent_class_id
                     parent_name = obj.parent_class.classify_name
 
-                    class_list = query_classification_supervisor(obj.id, class_list)
+                    class_list = query_classification_supervisor(parent_id, class_list)
 
                 ret_data.append({
                     'id': obj.id,
