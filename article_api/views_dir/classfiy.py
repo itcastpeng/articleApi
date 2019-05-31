@@ -132,12 +132,17 @@ def classfiy_oper(request, oper_type, o_id):
                 o_id, objs = form_clean_data.get('o_id')
                 oper_user_id = form_clean_data.get('oper_user_id')
                 classify_name = form_clean_data.get('classify_name')
-                parent_class, classifiy_level = form_clean_data.get('parent_class')
+
+                parent_class = ''
+                classifiy_level = 1
+                if form_clean_data.get('parent_class'):
+                    parent_class, classifiy_level = form_clean_data.get('parent_class')
 
                 objs.update(
                     oper_user_id=oper_user_id,
                     classify_name=classify_name,
-                    parent_class_id=parent_class
+                    parent_class_id=parent_class,
+                    level=classifiy_level
                 )
                 response.code = 200
                 response.msg = '修改成功'
