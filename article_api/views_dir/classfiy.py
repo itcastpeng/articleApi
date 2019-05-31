@@ -7,7 +7,7 @@ from article_api.publicFunc.condition_com import conditionCom
 from article_api.forms.classfiy import AddForm, UpdateForm, SelectForm
 from article_api.publicFunc import public
 import json
-
+from article_api.publicFunc.public import Classification_judgment, query_classification_supervisor
 
 # cerf  token验证 分类查询
 @csrf_exempt
@@ -49,18 +49,22 @@ def classfiy(request):
 
                 parent_id = ''
                 parent_name = ''
+                class_list = []
                 if obj.parent_class:
                     parent_id = obj.parent_class_id
                     parent_name = obj.parent_class.classify_name
+
+                    class_list = query_classification_supervisor(obj.id, class_list)
 
                 ret_data.append({
                     'id': obj.id,
                     'name': obj.classify_name,                          # 分类名称
                     'parent_id': parent_id,                             # 父级ID
                     'parent_name': parent_name,                         # 父级分类名称
-                    'level': obj.level,                         # 父级分类名称
+                    'level': obj.level,                                 # 父级分类名称
                     'oper_user_id': obj.oper_user_id,                   # 操作人ID
                     'oper_user__username': obj.oper_user.username,      # 操作人
+                    'class_list': class_list,                           # 所有分类
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                 })
 

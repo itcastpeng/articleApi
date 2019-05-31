@@ -58,6 +58,7 @@ urlpatterns = [
     # url(r'^send_article$', celery_views.send_article),  # 上传文章
     # url(r'^article_read_detail$', celery_views.article_read_detail),  # 获取文章阅读情况
     url(r'^error_send_msg$', qiniu_oper.error_send_msg),
+    # url(r'^test$', qiniu_oper.test),
 ]
 
 

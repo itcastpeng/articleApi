@@ -38,5 +38,32 @@ def error_send_msg(request):
     return JsonResponse(response.__dict__)
 
 
+# def test(request):
+#     title = """
+#         植发
+#         植眉
+#         植胡须
+#         """
+#     for i in title.split(' '):
+#         if i.strip():
+#             models.classfiy.objects.create(
+#                 oper_user_id=6,
+#                 parent_class_id=258,
+#                 classify_name=i.strip(),
+#                 level=3
+#             )
+#     return HttpResponse('')
+
+
+
+
+
+
+
+
+
+
+
+
 
 
