@@ -158,9 +158,13 @@ def classfiy_oper(request, oper_type, o_id):
             if objs:
                 child_objs = models.classfiy.objects.filter(parent_class_id=o_id)
                 if not child_objs:
-                    objs.delete()
-                    response.code = 200
-                    response.msg = '删除成功'
+                    if models.article.objects.filter(classfiy_id=o_id):
+                        response.code = 301
+                        response.msg = '该分类下存在文章'
+                    else:
+                        objs.delete()
+                        response.code = 200
+                        response.msg = '删除成功'
 
                 else:
                     response.code = 301

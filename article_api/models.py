@@ -63,7 +63,8 @@ class article(models.Model):
     is_delete = models.IntegerField(verbose_name='逻辑删除', default=0)
 
     article_source_choices = (
-        (1, '合众编辑'),
+        (1, '添加'),
+        (1, '转载'),
     )
     article_source = models.SmallIntegerField(verbose_name='文章来源', choices=article_source_choices, default=1)
     is_send = models.IntegerField(verbose_name='是否上传', default=0)
