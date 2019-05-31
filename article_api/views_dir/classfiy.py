@@ -105,20 +105,27 @@ def classfiy_oper(request, oper_type, o_id):
                 form_clean_data = forms_obj.cleaned_data
                 oper_user_id = form_clean_data.get('oper_user_id')
                 classify_name = form_clean_data.get('classify_name')
+
                 parent_class = ''
                 num = 1
                 if form_clean_data.get('parent_class'):
                     parent_class, num = form_clean_data.get('parent_class')
 
-                models.classfiy.objects.create(
-                    oper_user_id=oper_user_id,
-                    classify_name=classify_name,
-                    parent_class_id=parent_class,
-                    level=num
-                )
+                objs = models.classfiy.objects.filter(level=num, classify_name=classify_name)
+                if objs:
+                    response.code = 301
+                    response.msg = '{num}级分类已存在该名称'.format(num=num)
 
-                response.code = 200
-                response.msg = "添加成功"
+                else:
+                    models.classfiy.objects.create(
+                        oper_user_id=oper_user_id,
+                        classify_name=classify_name,
+                        parent_class_id=parent_class,
+                        level=num
+                    )
+
+                    response.code = 200
+                    response.msg = "添加成功"
 
             else:
                 response.code = 301
