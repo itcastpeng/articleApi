@@ -131,7 +131,7 @@ def classfiy_oper(request, oper_type, o_id):
                 form_clean_data = forms_obj.cleaned_data
                 o_id, objs = form_clean_data.get('o_id')
                 oper_user_id = form_clean_data.get('oper_user_id')
-                classify_name = form_clean_data.get('classify_name')
+                classify_name, classifiy_level = form_clean_data.get('classify_name')
                 parent_class = form_clean_data.get('parent_class')
 
                 objs.update(
