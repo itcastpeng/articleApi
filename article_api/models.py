@@ -64,7 +64,7 @@ class article(models.Model):
 
     article_source_choices = (
         (1, '添加'),
-        (1, '转载'),
+        (2, '转载'),
     )
     article_source = models.SmallIntegerField(verbose_name='文章来源', choices=article_source_choices, default=1)
     is_send = models.IntegerField(verbose_name='是否上传', default=0)
@@ -72,6 +72,7 @@ class article(models.Model):
     stop_upload = models.IntegerField(verbose_name='停止/恢复上传', default=0)
     classfiy = models.ForeignKey('classfiy', verbose_name='类别')
     article_word_count = models.IntegerField(verbose_name='文章字数', null=True)
+    original_link = models.CharField(verbose_name='原文链接(仅限article_source=2)', max_length=512, null=True)
 
 # 计费结算日志
 class billing_log(models.Model):

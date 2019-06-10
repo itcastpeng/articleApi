@@ -49,15 +49,14 @@ urlpatterns = [
     # 七牛云
     url(r'^qiniu/(?P<oper_type>\w+)$', qiniu_oper.qiniu_oper),
 
+    # 错误 提示
+    url(r'^error_send_msg$', qiniu_oper.error_send_msg),
 
-    # 结算管理
-    # url(r'^settlement_rules/(?P<oper_type>\w+)/(?P<o_id>\d+)$', settlement_rules.settlement_rules_oper),
-    # url(r'^settlement_rules', settlement_rules.settlement_rules),
+
+
 
     # celery 执行视图
     # url(r'^send_article$', celery_views.send_article),  # 上传文章
-    # url(r'^article_read_detail$', celery_views.article_read_detail),  # 获取文章阅读情况
-    url(r'^error_send_msg$', qiniu_oper.error_send_msg),
     # url(r'^test$', qiniu_oper.test),
 ]
 

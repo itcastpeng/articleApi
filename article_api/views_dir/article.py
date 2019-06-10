@@ -5,6 +5,7 @@ from article_api.publicFunc.condition_com import conditionCom
 from article_api.forms.article import AddForm, UpdateForm, SelectForm, DeleteForm
 from article_api.publicFunc import Response, account
 from article_api.publicFunc.public import Classification_judgment, query_classification_supervisor
+from article_api.publicFunc.public import get_content
 import json, datetime, requests, time
 
 # cerf  token验证 用户展示模块
@@ -160,6 +161,31 @@ def article_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
+
+        # 转载文章添加
+        elif oper_type == 'add_reposts':
+            reprint_link = request.POST.get('reprint_link')
+            if reprint_link and 'http' in reprint_link:
+                ret = requests.get(reprint_link)
+                response.code = 301
+                status_code = ret.status_code # 请求状态
+                if status_code == 200:
+                    get_content(reprint_link)
+
+
+
+                    response.code = 200
+                    msg = '添加成功'
+                else:
+                    msg = '请求链接异常'
+
+            else:
+                if not reprint_link:
+                    msg = '请输入链接'
+                else:
+                    msg = '链接错误'
+
+            response.msg = msg
 
     else:
 
