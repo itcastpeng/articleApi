@@ -98,7 +98,6 @@ def time_screen(number_days):
             days = 1
 
         for day in range(days):
-            day += 1
             specify_time = now_datetime - datetime.timedelta(days=day)
             ymd = datetime.datetime.strftime((specify_time), '%Y-%m-%d')
             start_time = ymd + ' 00:00:00'
@@ -109,6 +108,7 @@ def time_screen(number_days):
                 'stop_time': stop_time
             })
 
+            day += 1
 
     return data
 
@@ -145,7 +145,7 @@ def Classification_judgment(classify_list):
 # 查询 分类所有上级
 def query_classification_supervisor(classify_id, class_list):
     obj = models.classfiy.objects.get(id=classify_id)
-    print('obj.parent_class_id------------>', obj.parent_class_id)
+    # print('obj.parent_class_id------------>', obj.parent_class_id)
     if obj.parent_class_id:
         class_list.append({
             'level':obj.level,
