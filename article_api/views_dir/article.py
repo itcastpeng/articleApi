@@ -50,7 +50,7 @@ def article(request):
                     'edit_name': obj.edit_name,                                     # 作者别名
                     'article_source_id': obj.article_source,                        # 文章来源ID
                     'article_source': obj.get_article_source_display(),             # 文章来源
-                    'stop_upload': obj.stop_upload,                                 # 是否停止发布
+                    # 'stop_upload': obj.stop_upload,                                 # 是否停止发布
                     'classfiy_id': classfiy_id,                                     # 分类ID
                     'classfiy_name': classfiy_name,                                 # 分类名称
                     'article_word_count': obj.article_word_count,                   # 文章字数
