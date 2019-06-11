@@ -13,11 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
-from article_api.views_dir import login, user, permissions, role, settlement_rules, article, celery_views, \
+from django.conf.urls import url, include
+from article_api.views_dir import login, user, permissions, role, settlement_rules, article, \
     classfiy, data_statistics, qiniu_oper
 
 urlpatterns = [
+
+    # celery 路由
+    url(r'^celery/', include('article_api.views_dir.celery.urls')),
 
     # 数据统计
     url(r'^data_statistics/(?P<oper_type>\w+)$', data_statistics.data_statistics),

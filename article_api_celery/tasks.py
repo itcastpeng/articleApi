@@ -1,0 +1,28 @@
+from __future__ import absolute_import, unicode_literals
+from .celery import app
+from article_api.publicFunc.host import URL
+import requests, datetime
+
+
+
+# @app.task
+# def upload_day_eye():
+#     url = '{}/api/day_eye_data?timestamp=1545822031837&rand_str=28a922b00654c407007f3d712c2fdd6b&user_id=1'.format(host_url)
+#     # url = 'http://127.0.0.1:8008/api/day_eye_data?timestamp=1545822031837&rand_str=28a922b00654c407007f3d712c2fdd6b&user_id=1'
+#     print('-----------------------------------celery---------同步天眼(谁看了我)--------> ', datetime.datetime.today())
+#     requests.get(url)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -3,10 +3,12 @@ from article_api import models
 from bs4 import BeautifulSoup
 from article_api.publicFunc.account import randon_str
 from urllib.parse import unquote
-import datetime, re, requests, random, time, os, sys
+from article_api.publicFunc.host import URL, QINIU_URL
+import datetime, re, requests, random, time, os, sys, qiniu
 
-URL = 'http://wenzhangku.zhugeyingxiao.com/api/'
-pub_statics_url = os.path.join('statics', 'img')  # 公共文件夹
+
+# pub_statics_url = os.path.join('statics', 'img')  # 公共文件夹
+pub_statics_url = 'statics/img'  # 公共文件夹
 
 
 # 记录用户最后登录时间
@@ -159,34 +161,76 @@ def query_classification_supervisor(classify_id, class_list):
         })
     return class_list
 
+# 上传七牛云
+def update_qiniu(img_path, key=None):
+    # 需要填写你的 Access Key 和 Secret Key
+    SecretKey = 'wVig2MgDzTmN_YqnL-hxVd6ErnFhrWYgoATFhccu'
+    AccessKey = 'a1CqK8BZm94zbDoOrIyDlD7_w7O8PqJdBHK-cOzz'
+
+    # 构建鉴权对象
+    q = qiniu.Auth(AccessKey, SecretKey)
+    bucket_name = 'bjhzkq_tianyan'
+
+    if not key:
+        token = q.upload_token(bucket_name)  # 可以指定key 图片名称
+        data = {
+            'token': token
+        }
+    else:
+        token = q.upload_token(bucket_name, key, 3600)  # 可以指定key 图片名称
+        data = {
+            'token': token,
+            'key': key,
+        }
+
+    headers = {
+        'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13'
+    }
+
+    url = 'https://up-z1.qiniup.com/'
+
+    files = {
+        'file':open(img_path, 'rb')
+    }
+
+    ret = requests.post(url, data=data, files=files, headers=headers)
+
+    # if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
+    #     os.remove(img_path)  # 删除本地图片
+    img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.json().get('key')
+    return img_path
+
+
 # 下载视频到本地
-def requests_video_download(url):
-    img_save_path = pub_statics_url + randon_str() + '.mp4'
+def requests_video_download(url, name):
+    img_save_path = pub_statics_url + name + '.mp4'
     r = requests.get(url, stream=True)
     with open(img_save_path, "wb") as mp4:
         for chunk in r.iter_content(chunk_size=1024 * 1024):
             if chunk:
                 mp4.write(chunk)
+    update_qiniu(img_save_path, name) # 上传七牛云
 
-    return URL + img_save_path
 
 # 下载微信图片 到本地 并返回新连接
-def download_img(img_content, headers):
-    randon_str_obj = randon_str()
-    if 'wx_fmt=gif' in img_content:
-        img_name = "/{}.gif".format(randon_str_obj)
-    else:
-        img_name = "/{}.jpg".format(randon_str_obj)
-    path = pub_statics_url + img_name
-    ret = requests.get(img_content, headers=headers)
+def download_img(img_content, name):
+    path = pub_statics_url + name
+    ret = requests.get(img_content)
     with open(path, 'wb') as file:
         file.write(ret.content)
-    return URL + path
+    update_qiniu(path, name) # 上传七牛云
 
+# 判断是静态图还是动态图 返回名称
+def get_pic_name(img_path):
+    randon_str_obj = randon_str()
+    if 'wx_fmt=gif' in img_path:
+        name = "{}.gif".format(randon_str_obj)
+    else:
+        name = "{}.jpg".format(randon_str_obj)
+    return name
 
 # 获取微信文章
 def get_content(reprint_link):
-
     pcRequestHeader = [
         'Mozilla/5.0 (Windows NT 5.1; rv:6.0.2) Gecko/20100101 Firefox/6.0.2',
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17',
@@ -213,8 +257,9 @@ def get_content(reprint_link):
     cover_url = re.compile(r'var msg_cdn_url = (.*);').findall(ret.text)[0].replace('"', '')  # 封面
 
     soup = BeautifulSoup(ret.text, 'lxml')
-
-    cover_url = download_img(cover_url, headers) # 下载封面
+    cover_name = get_pic_name(cover_url) # 获取名称
+    download_img(cover_url, cover_name) # 下载封面
+    cover_url = QINIU_URL + cover_url
 
     # 获取所有样式
     style = ""
@@ -232,8 +277,9 @@ def get_content(reprint_link):
             if img_tag.attrs.get('style'):
                 img_tag.attrs['style'] = img_tag.attrs.get('style')
 
-            img_url = download_img(data_src, headers)
-            img_tag.attrs['data-src'] = img_url
+            img_name = get_pic_name(data_src)       # 获取图片名称
+            download_img(data_src, img_name) # 下载图片上传七牛云
+            img_tag.attrs['data-src'] = QINIU_URL + img_name
 
     ## 处理视频的URL
     iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
@@ -241,8 +287,10 @@ def get_content(reprint_link):
         shipin_url = iframe_tag.get('data-src')
         data_cover_url = iframe_tag.get('data-cover')  # 封面
         if data_cover_url:
-            data_cover_url = unquote(data_cover_url, 'utf-8')
-            data_cover_url = download_img(data_cover_url, headers) # 视频封面
+            data_cover_url = unquote(data_cover_url, 'utf-8') # URL解码
+            data_cover_name = get_pic_name(data_cover_url)                  # 获取封面名称
+            download_img(data_cover_url, data_cover_name)  # 下载视频封面
+            data_cover_url = QINIU_URL + data_cover_name
 
         vid = shipin_url.split('vid=')[1]
         if 'wxv' in vid:  # 下载
@@ -281,9 +329,9 @@ def get_content(reprint_link):
             results_url_list_2 = pattern2.findall(content)
             results_url_list_1.extend(results_url_list_2)
             for pattern_url in results_url_list_1:
-                file_dir = download_img(pattern_url, headers)
-                sub_url = 'http://statics.api.zhugeyingxiao.com/' + file_dir
-                content = content.replace(pattern_url, sub_url)
+                pattern_name = get_pic_name(pattern_url)            # 获取图片名称
+                download_img(pattern_url, pattern_name)  # 下载图片
+                content = content.replace(pattern_url, QINIU_URL + pattern_name)
         else:
             content = content.replace(key, value)
 
@@ -295,7 +343,7 @@ def get_content(reprint_link):
         'style': style,
         'content': content,
     }
-
+    print('result_data-----> ', result_data)
     return result_data
 
 
