@@ -181,10 +181,10 @@ class UpdateForm(forms.Form):
         o_id = self.data.get('o_id')
         obj = models.article.objects.filter(id=o_id)
         if obj:
-            if int(obj[0].is_send) != 0:
-                self.add_error('o_id', '该文章已上传, 如有疑问请联系管理员')
-            else:
-                return o_id, obj
+            # if int(obj[0].is_send) != 0:
+            #     self.add_error('o_id', '该文章已上传, 如有疑问请联系管理员')
+            # else:
+            return o_id, obj
         else:
             self.add_error('o_id', '亲, 数据丢了~')
 
@@ -271,3 +271,39 @@ class SelectForm(forms.Form):
         else:
             length = int(self.data['length'])
         return length
+
+# 转载文章
+class AddRepostsForm(forms.Form):
+    reprint_link = forms.CharField(
+        required=True,
+        error_messages={
+            'required': "转载的链接不能为空"
+        }
+    )
+    classfiy_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "分类类别不能为空"
+        }
+    )
+
+    def clean_classfiy_id(self):
+        classfiy_id = self.data.get('classfiy_id')
+        objs = models.classfiy.objects.filter(id=classfiy_id)
+        if objs:
+            obj = objs[0]
+            if obj.level == 3:
+                return classfiy_id
+            else:
+                self.add_error('classfiy_id', '请选取三级分类')
+        else:
+            self.add_error('classfiy_id', '该分类不存在')
+
+
+
+
+
+
+
+
+

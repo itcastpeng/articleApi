@@ -1,8 +1,13 @@
 from django.db.models import Q
 from article_api import models
 from bs4 import BeautifulSoup
-from article_api.publicFunc.base64_encryption import b64decode, b64encode
-import datetime, re, requests, random
+from article_api.publicFunc.account import randon_str
+from urllib.parse import unquote
+import datetime, re, requests, random, time, os, sys
+
+URL = 'http://wenzhangku.zhugeyingxiao.com/api/'
+pub_statics_url = os.path.join('statics', 'img')  # 公共文件夹
+
 
 # 记录用户最后登录时间
 def record_user_last_login_time(user_id):
@@ -154,6 +159,30 @@ def query_classification_supervisor(classify_id, class_list):
         })
     return class_list
 
+# 下载视频到本地
+def requests_video_download(url):
+    img_save_path = pub_statics_url + randon_str() + '.mp4'
+    r = requests.get(url, stream=True)
+    with open(img_save_path, "wb") as mp4:
+        for chunk in r.iter_content(chunk_size=1024 * 1024):
+            if chunk:
+                mp4.write(chunk)
+
+    return URL + img_save_path
+
+# 下载微信图片 到本地 并返回新连接
+def download_img(img_content, headers):
+    randon_str_obj = randon_str()
+    if 'wx_fmt=gif' in img_content:
+        img_name = "/{}.gif".format(randon_str_obj)
+    else:
+        img_name = "/{}.jpg".format(randon_str_obj)
+    path = pub_statics_url + img_name
+    ret = requests.get(img_content, headers=headers)
+    with open(path, 'wb') as file:
+        file.write(ret.content)
+    return URL + path
+
 
 # 获取微信文章
 def get_content(reprint_link):
@@ -185,6 +214,7 @@ def get_content(reprint_link):
 
     soup = BeautifulSoup(ret.text, 'lxml')
 
+    cover_url = download_img(cover_url, headers) # 下载封面
 
     # 获取所有样式
     style = ""
@@ -192,23 +222,80 @@ def get_content(reprint_link):
     for style_tag in style_tags:
         style += str(style_tag)
 
+    # 获取所有图片
+    body = soup.find('div', id="js_content")
+    body.attrs['style'] = "padding: 20px 16px 12px;"
+    img_tags = soup.find_all('img')
+    for img_tag in img_tags:
+        data_src = img_tag.attrs.get('data-src')
+        if data_src:
+            if img_tag.attrs.get('style'):
+                img_tag.attrs['style'] = img_tag.attrs.get('style')
 
+            img_url = download_img(data_src, headers)
+            img_tag.attrs['data-src'] = img_url
 
+    ## 处理视频的URL
+    iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
+    for iframe_tag in iframe:
+        shipin_url = iframe_tag.get('data-src')
+        data_cover_url = iframe_tag.get('data-cover')  # 封面
+        if data_cover_url:
+            data_cover_url = unquote(data_cover_url, 'utf-8')
+            data_cover_url = download_img(data_cover_url, headers) # 视频封面
 
+        vid = shipin_url.split('vid=')[1]
+        if 'wxv' in vid:  # 下载
+            iframe_url = 'https://mp.weixin.qq.com/mp/videoplayer?vid={}&action=get_mp_video_play_url'.format(vid)
+            ret = requests.get(iframe_url)
+            url = ret.json().get('url_info')[0].get('url')
+            img_save_path = requests_video_download(url)
+            iframe_tag_new = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
+                                                <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
+                                            </div>""".format(img_save_path, data_cover_url)
 
+        else:
+            if '&' in shipin_url and 'vid=' in shipin_url:
+                _url = shipin_url.split('?')[0]
+                shipin_url = _url + '?vid=' + vid
+            if vid:
+                shipin_url = 'https://v.qq.com/txp/iframe/player.html?origin=https%3A%2F%2Fmp.weixin.qq.com&vid={}&autoplay=false&full=true&show1080p=false&isDebugIframe=false'.format(
+                    vid
+                )
+            iframe_tag.attrs['data-src'] = shipin_url
+            iframe_tag.attrs['allowfullscreen'] = True  # 是否允许全屏
+            iframe_tag.attrs['data-cover'] = data_cover_url
 
+            iframe_tag_new = str(iframe_tag).replace('></iframe>', ' width="100%" height="500px"></iframe>')
+        body = str(body).replace(str(iframe_tag), iframe_tag_new)
+        body = BeautifulSoup(body, 'html.parser')
 
+    content = str(style) + str(body) # 相加 样式 和 内容
+    dict = {'url': '', 'data-src': 'src', '?wx_fmt=jpg': '', '?wx_fmt=png': '', '?wx_fmt=jpeg': '',
+            '?wx_fmt=gif': '', }  # wx_fmt=gif
+    for key, value in dict.items(): # 替换带有 mmbiz.qpic.cn 的链接 和微信识别的后缀
+        if key == 'url':
+            pattern1 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+\?\w+=\w+', re.I)  # 通过 re.compile 获得一个正则表达式对象
+            pattern2 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+', re.I)
+            results_url_list_1 = pattern1.findall(content)
+            results_url_list_2 = pattern2.findall(content)
+            results_url_list_1.extend(results_url_list_2)
+            for pattern_url in results_url_list_1:
+                file_dir = download_img(pattern_url, headers)
+                sub_url = 'http://statics.api.zhugeyingxiao.com/' + file_dir
+                content = content.replace(pattern_url, sub_url)
+        else:
+            content = content.replace(key, value)
 
+    result_data = {
+        'original_link': reprint_link,
+        'title': title,
+        'summary': summary,
+        'article_cover': cover_url,
+        'style': style,
+        'content': content,
+    }
 
-
-
-
-
-
-
-
-
-
-
+    return result_data
 
 

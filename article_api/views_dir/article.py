@@ -2,7 +2,7 @@ from article_api import models
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from article_api.publicFunc.condition_com import conditionCom
-from article_api.forms.article import AddForm, UpdateForm, SelectForm, DeleteForm
+from article_api.forms.article import AddForm, UpdateForm, SelectForm, DeleteForm, AddRepostsForm
 from article_api.publicFunc import Response, account
 from article_api.publicFunc.public import Classification_judgment, query_classification_supervisor
 from article_api.publicFunc.public import get_content
@@ -165,25 +165,45 @@ def article_oper(request, oper_type, o_id):
         # 转载文章添加
         elif oper_type == 'add_reposts':
             reprint_link = request.POST.get('reprint_link')
-            if reprint_link and 'http' in reprint_link:
-                ret = requests.get(reprint_link)
-                response.code = 301
-                status_code = ret.status_code # 请求状态
-                if status_code == 200:
-                    get_content(reprint_link)
+            classfiy_id = request.POST.get('classfiy_id')  # 类别
+            form_data = {
+                'reprint_link': reprint_link,
+                'classfiy_id': classfiy_id
+            }
 
-
-
-                    response.code = 200
-                    msg = '添加成功'
+            response.code = 301
+            forms_obj = AddRepostsForm(form_data)
+            if forms_obj.is_valid():
+                if reprint_link and 'http' in reprint_link:
+                    ret = requests.get(reprint_link)
+                    status_code = ret.status_code # 请求状态
+                    if status_code == 200:
+                        data = get_content(reprint_link)
+                        title = data.get('title')
+                        article_objs = models.article.objects.filter(
+                            title=title,
+                            is_delete=0
+                        )
+                        data['article_source'] = 2
+                        data['belongToUser_id'] = user_id
+                        data['classfiy_id'] = classfiy_id
+                        if not article_objs:
+                            models.article.objects.create(**data)
+                            response.code = 200
+                            msg = '添加成功'
+                        else:
+                            response.code = 200
+                            article_objs.update(**data)
+                            msg = '覆盖成功'
+                    else:
+                        msg = '请求链接异常'
                 else:
-                    msg = '请求链接异常'
-
+                    if not reprint_link:
+                        msg = '请输入链接'
+                    else:
+                        msg = '链接错误'
             else:
-                if not reprint_link:
-                    msg = '请输入链接'
-                else:
-                    msg = '链接错误'
+                msg = json.loads(forms_obj.errors.as_json())
 
             response.msg = msg
 
@@ -191,27 +211,28 @@ def article_oper(request, oper_type, o_id):
 
         # 停止发布
         if oper_type == 'stop_upload':
-            objs = models.article.objects.filter(id=o_id)
-            if not objs:
-                response.code = 301
-                response.msg = '文章未找到'
-            else:
-                if int(objs[0].is_send) != 0:
-                    response.code = 301
-                    response.msg = '该文章已上传, 如有疑问请联系管理员'
-                else:
-                    if int(objs[0].stop_upload) == 0:
-                        objs.update(
-                            stop_upload=1
-                        )
-                        msg = '停止发布成功'
-                    else:
-                        objs.update(
-                            stop_upload=0
-                        )
-                        msg = '开始发布成功'
-                    response.code = 200
-                    response.msg = msg
+            pass
+        #     objs = models.article.objects.filter(id=o_id)
+        #     if not objs:
+        #         response.code = 301
+        #         response.msg = '文章未找到'
+        #     else:
+        #         if int(objs[0].is_send) != 0:
+        #             response.code = 301
+        #             response.msg = '该文章已上传, 如有疑问请联系管理员'
+        #         else:
+        #             if int(objs[0].stop_upload) == 0:
+        #                 objs.update(
+        #                     stop_upload=1
+        #                 )
+        #                 msg = '停止发布成功'
+        #             else:
+        #                 objs.update(
+        #                     stop_upload=0
+        #                 )
+        #                 msg = '开始发布成功'
+        #             response.code = 200
+        #             response.msg = msg
 
         else:
             response.code = 402
