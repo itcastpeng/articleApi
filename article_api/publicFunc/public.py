@@ -58,7 +58,7 @@ def data_statistics_get_article(num, o_id):
     for obj in objs:
         article_count = models.article.objects.filter(classfiy=obj.id).count()
         num += article_count
-        data_statistics_get_article(obj.id, num)
+        num = data_statistics_get_article(num, obj.id)
         # article_list = []
         # for article_obj in article_objs:
         #     article_list.append({

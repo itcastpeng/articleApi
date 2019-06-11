@@ -28,10 +28,10 @@ def data_statistics(request, oper_type):
         article_count = 0 # 文章总数
 
         for obj in objs:
-            clsas_id = obj.id
+            class_id = obj.id
 
-            first_num = models.article.objects.filter(classfiy=clsas_id).count()
-            num = data_statistics_get_article(0, clsas_id)
+            first_num = models.article.objects.filter(classfiy=class_id).count() # 一级分类
+            num = data_statistics_get_article(0, class_id)
             classify_count = first_num + num # 单个分类总数
             data_list.append({
                 'classify_id': obj.id,
