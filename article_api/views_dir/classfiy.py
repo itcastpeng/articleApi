@@ -6,8 +6,9 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from article_api.publicFunc.condition_com import conditionCom
 from article_api.forms.classfiy import AddForm, UpdateForm, SelectForm
 from article_api.publicFunc import public
-import json
 from article_api.publicFunc.public import Classification_judgment, query_classification_supervisor
+from django.db.models import Q, Count
+import json
 
 # cerf  token验证 分类查询
 @csrf_exempt
@@ -185,6 +186,7 @@ def classfiy_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = '删除ID不存在'
 
+
     else:
 
         # 查询分类树状图
@@ -195,7 +197,20 @@ def classfiy_oper(request, oper_type, o_id):
             response.msg = '查询成功'
             response.data = {'ret_data': result_data}
 
-        response.code = 402
-        response.msg = "请求异常"
+        # 分类等级查询
+        elif oper_type == 'classification_level_query':
+            objs = models.classfiy.objects.values('level').annotate(Count('id'))
+            ret_data = []
+            for obj in objs:
+                ret_data.append(str(obj.get('level')) + '级分类')
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'ret_data': ret_data
+            }
+
+        else:
+            response.code = 402
+            response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)
