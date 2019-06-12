@@ -202,7 +202,9 @@ def classfiy_oper(request, oper_type, o_id):
             objs = models.classfiy.objects.values('level').annotate(Count('id'))
             ret_data = []
             for obj in objs:
-                ret_data.append(str(obj.get('level')) + '级分类')
+                ret_data.append(
+                    obj.get('level')
+                )
             response.code = 200
             response.msg = '查询成功'
             response.data = {
