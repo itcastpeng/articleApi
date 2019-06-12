@@ -68,28 +68,12 @@ class article(models.Model):
         (2, '转载'),
     )
     article_source = models.SmallIntegerField(verbose_name='文章来源', choices=article_source_choices, default=1)
-    edit_name = models.CharField(verbose_name='编辑名称', max_length=16)
+    edit_name = models.CharField(verbose_name='编辑名称', max_length=16, null=True)
     classfiy = models.ForeignKey('classfiy', verbose_name='类别')
     article_word_count = models.IntegerField(verbose_name='文章字数', null=True)
     original_link = models.TextField(verbose_name='原文链接(仅限article_source=2)', null=True)
 
-    # is_send = models.IntegerField(verbose_name='是否上传', default=0)
-    # stop_upload = models.IntegerField(verbose_name='停止/恢复上传', default=0)
-
-# 计费结算日志
-class billing_log(models.Model):
-    article = models.ForeignKey(to='article', verbose_name='归属文章')
-    price_num = models.CharField(verbose_name='拨出费用', max_length=128, null=True, blank=True)
-    create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-
-# 结算规则表
-# class settlement_rules(models.Model):
-#     reading_num = models.IntegerField(verbose_name='阅读量', default=0)
-#     reading_time = models.IntegerField(verbose_name='阅读时长(S)', default=0)
-#     the_amount_of = models.IntegerField(verbose_name='金额(元)', default=0)
-#     oper_user = models.ForeignKey('userprofile', verbose_name='操作人', null=True, related_name='oper_user_userprofile')
-
-
+    toward_whether = models.BooleanField(verbose_name='是否对公, 别的项目是否可查看该文章', default=0)
 
 
 

@@ -356,4 +356,13 @@ def get_content(reprint_link, get_content=None):
         }
     return result_data
 
+# 获取文章字数
+def get_article_word_count(content):
+    soup = BeautifulSoup(content, 'html.parser')
+    js_content = soup.find('div', id='js_content')
+    num = len(js_content.get_text().replace('\r\n', '').replace('\n', '').strip())
+    return num
+
+
+
 

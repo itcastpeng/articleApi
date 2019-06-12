@@ -113,9 +113,9 @@ class UpdateForm(forms.Form):
         }
     )
     summary = forms.CharField(
-        required=True,
+        required=False,
         error_messages={
-            'required': '文章摘要不能为空'
+            'required': '文章摘要类型错误'
         }
     )
 
@@ -145,9 +145,9 @@ class UpdateForm(forms.Form):
         }
     )
     edit_name = forms.CharField(
-        required=True,
+        required=False,
         error_messages={
-            'required': "亲, 请写文章编辑人别名!"
+            'required': "编辑人别名类型错误"
         }
     )
     article_word_count = forms.IntegerField(
@@ -221,17 +221,17 @@ class DeleteForm(forms.Form):
             self.add_error('belongToUser_id', '非法用户')
 
     # 验证文章ID
-    def clean_o_id(self):
-        o_id = self.data.get('o_id')
-        belongToUser_id = self.data.get('belongToUser_id')
-        obj = models.article.objects.filter(id=o_id, belongToUser_id=belongToUser_id)
-        if not obj:
-            self.add_error('o_id', '亲, 您不能删除这个文章!')
-        else:
-            if int(obj[0].is_send) == 0:
-                return o_id, obj
-            else:
-                self.add_error('o_id', '该文章已上传, 如有疑问请联系管理员')
+    # def clean_o_id(self):
+    #     o_id = self.data.get('o_id')
+    #     belongToUser_id = self.data.get('belongToUser_id')
+    #     obj = models.article.objects.filter(id=o_id, belongToUser_id=belongToUser_id)
+    #     if not obj:
+    #         self.add_error('o_id', '亲, 您不能删除这个文章!')
+    #     else:
+    #         if int(obj[0].is_send) == 0:
+    #             return o_id, obj
+    #         else:
+    #             self.add_error('o_id', '该文章已上传, 如有疑问请联系管理员')
 
 
 
@@ -286,7 +286,12 @@ class AddRepostsForm(forms.Form):
             'required': "分类类别不能为空"
         }
     )
-
+    edit_name = forms.CharField(
+        required=True,
+        error_messages={
+            'required': "编辑名称不能为空"
+        }
+    )
     def clean_classfiy_id(self):
         classfiy_id = self.data.get('classfiy_id')
         objs = models.classfiy.objects.filter(id=classfiy_id)

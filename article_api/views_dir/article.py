@@ -4,8 +4,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from article_api.publicFunc.condition_com import conditionCom
 from article_api.forms.article import AddForm, UpdateForm, SelectForm, DeleteForm, AddRepostsForm
 from article_api.publicFunc import Response, account
-from article_api.publicFunc.public import Classification_judgment, query_classification_supervisor
-from article_api.publicFunc.public import get_content
+from article_api.publicFunc.public import query_classification_supervisor, get_content, get_article_word_count
 import json, datetime, requests, time
 
 # cerf  token验证 用户展示模块
@@ -150,25 +149,30 @@ def article_oper(request, oper_type, o_id):
 
         # 删除文章
         elif oper_type == "delete":
-            forms_obj = DeleteForm(form_data)
-            if forms_obj.is_valid():
-                o_id, obj = forms_obj.cleaned_data.get('o_id')
-                obj[0].is_delete = 1
-                obj[0].save()
-                response.code = 200
-                response.msg = '删除成功'
-
-            else:
-                response.code = 301
-                response.msg = json.loads(forms_obj.errors.as_json())
+            models.article.objects.get(id=o_id).delete()
+            response.code = 200
+            response.msg = '删除成功'
+            # forms_obj = DeleteForm(form_data)
+            # if forms_obj.is_valid():
+            #     o_id, obj = forms_obj.cleaned_data.get('o_id')
+            #     obj[0].is_delete = 1
+            #     obj[0].save()
+            #     response.code = 200
+            #     response.msg = '删除成功'
+            #
+            # else:
+            #     response.code = 301
+            #     response.msg = json.loads(forms_obj.errors.as_json())
 
         # 转载文章添加
         elif oper_type == 'add_reposts':
+            edit_name = request.POST.get('edit_name') # 别名
             reprint_link = request.POST.get('reprint_link')
             classfiy_id = request.POST.get('classfiy_id')  # 类别
             form_data = {
                 'reprint_link': reprint_link,
-                'classfiy_id': classfiy_id
+                'classfiy_id': classfiy_id,
+                'edit_name': edit_name
             }
 
             response.code = 301
@@ -180,6 +184,7 @@ def article_oper(request, oper_type, o_id):
                     if status_code == 200:
                         data = get_content(reprint_link)
                         title = data.get('title')
+                        num = get_article_word_count(data.get('content')) # 获取文章字数
                         article_objs = models.article.objects.filter(
                             title=title,
                             is_delete=0
@@ -187,6 +192,8 @@ def article_oper(request, oper_type, o_id):
                         data['article_source'] = 2
                         data['belongToUser_id'] = user_id
                         data['classfiy_id'] = classfiy_id
+                        data['edit_name'] = edit_name   # 编辑别名
+                        data['article_word_count'] = num # 文章字数
                         if not article_objs:
                             models.article.objects.create(**data)
                             response.code = 200
@@ -209,30 +216,11 @@ def article_oper(request, oper_type, o_id):
 
     else:
 
-        # 停止发布
-        if oper_type == 'stop_upload':
-            pass
-        #     objs = models.article.objects.filter(id=o_id)
-        #     if not objs:
-        #         response.code = 301
-        #         response.msg = '文章未找到'
-        #     else:
-        #         if int(objs[0].is_send) != 0:
-        #             response.code = 301
-        #             response.msg = '该文章已上传, 如有疑问请联系管理员'
-        #         else:
-        #             if int(objs[0].stop_upload) == 0:
-        #                 objs.update(
-        #                     stop_upload=1
-        #                 )
-        #                 msg = '停止发布成功'
-        #             else:
-        #                 objs.update(
-        #                     stop_upload=0
-        #                 )
-        #                 msg = '开始发布成功'
-        #             response.code = 200
-        #             response.msg = msg
+        # 测试
+        if oper_type == 'test':
+            obj = models.article.objects.get(id=o_id)
+            get_article_word_count(obj.content)
+
 
         else:
             response.code = 402
