@@ -7,8 +7,8 @@ from article_api.publicFunc.host import URL, QINIU_URL
 import datetime, re, requests, random, time, os, sys, qiniu
 
 
-# pub_statics_url = os.path.join('statics', 'img')  # 公共文件夹
-pub_statics_url = 'statics/img'  # 公共文件夹
+pub_statics_url = os.path.join('statics', 'img')  # 公共文件夹
+# pub_statics_url = 'statics/img'  # 公共文件夹
 
 
 # 记录用户最后登录时间
