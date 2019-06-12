@@ -252,13 +252,13 @@ def get_content(reprint_link, get_content=None):
     ]
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(reprint_link, headers=headers)
-    title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
-    summary = re.compile(r'var msg_desc = (.*);').findall(ret.text)[0].replace('"', '')  # 摘要
-    cover_url = re.compile(r'var msg_cdn_url = (.*);').findall(ret.text)[0].replace('"', '')  # 封面
-    is_video_original_link = None  # 是否有视频 如果有则返回原文链接
-
     soup = BeautifulSoup(ret.text, 'lxml')
     if not get_content:
+        title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
+        summary = re.compile(r'var msg_desc = (.*);').findall(ret.text)[0].replace('"', '')  # 摘要
+        cover_url = re.compile(r'var msg_cdn_url = (.*);').findall(ret.text)[0].replace('"', '')  # 封面
+        is_video_original_link = None  # 是否有视频 如果有则返回原文链接
+
         cover_name = get_pic_name(cover_url) # 获取名称
         download_img(cover_url, cover_name) # 下载封面
         cover_url = update_qiniu(pub_statics_url + cover_name) # 上传七牛
