@@ -209,7 +209,7 @@ def requests_video_download(url, name):
         for chunk in r.iter_content(chunk_size=1024 * 1024):
             if chunk:
                 mp4.write(chunk)
-    update_qiniu(img_save_path, name) # 上传七牛云
+    # update_qiniu(img_save_path, name) # 上传七牛云
 
 
 # 下载微信图片 到本地 并返回新连接
@@ -218,7 +218,7 @@ def download_img(img_content, name):
     ret = requests.get(img_content)
     with open(path, 'wb') as file:
         file.write(ret.content)
-    update_qiniu(path, name) # 上传七牛云
+    # update_qiniu(path, name) # 上传七牛云
 
 # 判断是静态图还是动态图 返回名称
 def get_pic_name(img_path):
@@ -230,7 +230,7 @@ def get_pic_name(img_path):
     return name
 
 # 获取微信文章
-def get_content(reprint_link):
+def get_content(reprint_link, get_content=None):
     pcRequestHeader = [
         'Mozilla/5.0 (Windows NT 5.1; rv:6.0.2) Gecko/20100101 Firefox/6.0.2',
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17',
@@ -255,11 +255,13 @@ def get_content(reprint_link):
     title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
     summary = re.compile(r'var msg_desc = (.*);').findall(ret.text)[0].replace('"', '')  # 摘要
     cover_url = re.compile(r'var msg_cdn_url = (.*);').findall(ret.text)[0].replace('"', '')  # 封面
+    is_video_original_link = None  # 是否有视频 如果有则返回原文链接
 
     soup = BeautifulSoup(ret.text, 'lxml')
-    cover_name = get_pic_name(cover_url) # 获取名称
-    download_img(cover_url, cover_name) # 下载封面
-    cover_url = QINIU_URL + cover_url
+    if not get_content:
+        cover_name = get_pic_name(cover_url) # 获取名称
+        download_img(cover_url, cover_name) # 下载封面
+        cover_url = update_qiniu(pub_statics_url + cover_name) # 上传七牛
 
     # 获取所有样式
     style = ""
@@ -279,8 +281,10 @@ def get_content(reprint_link):
 
             img_name = get_pic_name(data_src)       # 获取图片名称
             download_img(data_src, img_name) # 下载图片上传七牛云
-            img_tag.attrs['data-src'] = QINIU_URL + img_name
+            img_name = update_qiniu(pub_statics_url + img_name)  # 上传七牛
+            img_tag.attrs['data-src'] = img_name
 
+    flag = False
     ## 处理视频的URL
     iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
     for iframe_tag in iframe:
@@ -290,17 +294,17 @@ def get_content(reprint_link):
             data_cover_url = unquote(data_cover_url, 'utf-8') # URL解码
             data_cover_name = get_pic_name(data_cover_url)                  # 获取封面名称
             download_img(data_cover_url, data_cover_name)  # 下载视频封面
-            data_cover_url = QINIU_URL + data_cover_name
+            data_cover_url = update_qiniu(pub_statics_url + data_cover_name)  # 上传七牛
 
         vid = shipin_url.split('vid=')[1]
         if 'wxv' in vid:  # 下载
+            flag = True
             iframe_url = 'https://mp.weixin.qq.com/mp/videoplayer?vid={}&action=get_mp_video_play_url'.format(vid)
             ret = requests.get(iframe_url)
             url = ret.json().get('url_info')[0].get('url')
-            img_save_path = requests_video_download(url)
             iframe_tag_new = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                                 <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
-                                            </div>""".format(img_save_path, data_cover_url)
+                                            </div>""".format(url, data_cover_url)
 
         else:
             if '&' in shipin_url and 'vid=' in shipin_url:
@@ -331,19 +335,25 @@ def get_content(reprint_link):
             for pattern_url in results_url_list_1:
                 pattern_name = get_pic_name(pattern_url)            # 获取图片名称
                 download_img(pattern_url, pattern_name)  # 下载图片
+                pattern_name = update_qiniu(pub_statics_url + pattern_name)  # 上传七牛
                 content = content.replace(pattern_url, QINIU_URL + pattern_name)
         else:
             content = content.replace(key, value)
-
-    result_data = {
-        'original_link': reprint_link,
-        'title': title,
-        'summary': summary,
-        'article_cover': cover_url,
-        'style': style,
-        'content': content,
-    }
-    print('result_data-----> ', result_data)
+    if flag:
+        is_video_original_link = reprint_link
+    if not get_content:
+        result_data = {
+            'original_link': is_video_original_link,
+            'title': title,
+            'summary': summary,
+            'article_cover': cover_url,
+            'style': style,
+            'content': content,
+        }
+    else:
+        result_data = {
+            'content': content,
+        }
     return result_data
 
 

@@ -7,8 +7,8 @@ from article_api.views_dir.celery import celery_public
 urlpatterns = [
 
 
-    # 调用 下载资源到本地
-    url(r'^download_inter/(?P<oper_type>\w+)$', celery_public.download_inter),
+    # 定时更新 文章
+    url(r'^celery_regularly_update_articles$', celery_public.celery_regularly_update_articles),
 
 
 ]

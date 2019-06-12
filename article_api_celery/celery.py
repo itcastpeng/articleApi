@@ -14,12 +14,13 @@ CELERYD_FORCE_EXECV = True    # 非常重要,有些情况下可以防止死锁
 CELERYD_MAX_TASKS_PER_CHILD = 100    # 每个worker最多执行万100个任务就会被销毁，可防止内存泄露
 app.conf.beat_schedule = {
 
-    # 'upload_day_eye':{
-    #     'task':'tianyan_celery.tasks.upload_day_eye',
-    #     # 'schedule': crontab("0", '*/1', '*', '*', '*'),  # 此处跟 linux 中 crontab 的格式一样
-    #     'schedule': crontab(minute='*/1'),  # 直接写个10为1小时执行一次  */10 为 十分钟一次
-    #     'args':[] # # 传入任务函数的参数,可以是一个列表或元组,如果函数没参数则为空列表或空元组
-    # },
+    # 更新文章 (10分钟一次)
+    'update_article':{
+        'task':'tianyan_celery.tasks.update_article',
+        # 'schedule': crontab("0", '*/1', '*', '*', '*'),  # 此处跟 linux 中 crontab 的格式一样
+        'schedule': crontab(minute='*/10'),  # 直接写个10为1小时执行一次  */10 为 十分钟一次
+        'args':[] # # 传入任务函数的参数,可以是一个列表或元组,如果函数没参数则为空列表或空元组
+    },
 
 
 
