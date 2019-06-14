@@ -40,18 +40,39 @@ def error_send_msg(request):
 
 # def test(request):
 #     title = """
-#         植发
-#         植眉
-#         植胡须
+#         鼻部整形
+#         眼部整形
+#         胸部整形
+#         面部轮廓
+#         唇部整形
+#         除皱
+#         牙齿美容
+#         微创注射
+#         无创激光
+#         纹绣
+#         脂肪
+#         私密整形
+#         毛发种植
+#
 #         """
-#     for i in title.split(' '):
-#         if i.strip():
+#     for i in title.split('\n'):
+#         title = i.replace('\r\n', '').replace('\n', '').strip()
+#         if title:
+#             print('title----> ', title)
+#             obj = models.classfiy.objects.create(
+#                 oper_user_id=6,
+#                 parent_class_id=435,
+#                 classify_name=title,
+#                 level=2
+#             )
+#             print('title-----> ', obj.id, title)
 #             models.classfiy.objects.create(
 #                 oper_user_id=6,
-#                 parent_class_id=258,
-#                 classify_name=i.strip(),
+#                 parent_class_id=obj.id,
+#                 classify_name=title,
 #                 level=3
 #             )
+#
 #     return HttpResponse('')
 
 

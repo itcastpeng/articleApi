@@ -360,6 +360,7 @@ def get_content(reprint_link, get_content=None):
 def get_article_word_count(content):
     soup = BeautifulSoup(content, 'html.parser')
     js_content = soup.find('div', id='js_content')
+    print('js_content.get_text()------------------------> ',  js_content.get_text().replace('\r\n', '').replace('\n', '').strip())
     num = len(js_content.get_text().replace('\r\n', '').replace('\n', '').strip())
     return num
 
