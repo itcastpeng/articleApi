@@ -44,6 +44,17 @@ def error_send_msg(request):
 
     return JsonResponse(response.__dict__)
 
+def get_case(request):
+    response = Response.ResponseObj()
+    objs = models.pachong.objects.all().order_by('create_date')
+    if objs:
+        response.code = 200
+        obj = objs[0]
+        response.data = obj.url
+
+    else:
+        response.code = 301
+    return JsonResponse(response.__dict__)
 
 # def test(request):
 #     title = """
