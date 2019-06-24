@@ -62,6 +62,12 @@ class AddForm(forms.Form):
             'required': "分类不能为空"
         }
     )
+    toward_whether = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "是否对外不能为空"
+        }
+    )
 
     def clean_classfiy_id(self):
         classfiy_id = self.data.get('classfiy_id')
@@ -156,6 +162,13 @@ class UpdateForm(forms.Form):
             'required': "文章字数不能为空"
         }
     )
+    toward_whether = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "是否对外不能为空"
+        }
+    )
+
     # 查询名称是否存在
     def clean_title(self):
         title = self.data.get('title')

@@ -54,6 +54,7 @@ def article(request):
                     'classfiy_name': classfiy_name,                                 # 分类名称
                     'article_word_count': obj.article_word_count,                   # 文章字数
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),   # 文章创建时间
+                    'toward_whether': obj.toward_whether,                           # 是否对外公开
                 }
 
                 if id:
@@ -109,7 +110,8 @@ def article_oper(request, oper_type, o_id):
             'article_word_count':request.POST.get('article_word_count', 0), # 文章字数
             'edit_name': request.POST.get('edit_name'),             # 编辑别名
             'article_source': request.POST.get('article_source'),   # 文章来源
-            'classfiy_id': request.POST.get('classfiy_id')   # 类别
+            'classfiy_id': request.POST.get('classfiy_id'),         # 类别
+            'toward_whether': request.POST.get('toward_whether', 0)    # 是否对外公开
         }
 
 
@@ -131,6 +133,7 @@ def article_oper(request, oper_type, o_id):
             if forms_obj.is_valid():
                 o_id, obj = forms_obj.cleaned_data.get('o_id')
                 obj.update(**{
+                    'toward_whether':forms_obj.cleaned_data.get('toward_whether'),
                     'title':forms_obj.cleaned_data.get('title'),
                     'summary':forms_obj.cleaned_data.get('summary'),
                     'content':forms_obj.cleaned_data.get('content'),

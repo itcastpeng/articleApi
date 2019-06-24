@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from article_api.views_dir import login, user, permissions, role, settlement_rules, article, \
-    classfiy, data_statistics, qiniu_oper
+    classfiy, data_statistics, qiniu_oper, external_query_article
 
 urlpatterns = [
 
@@ -55,6 +55,8 @@ urlpatterns = [
     # 错误 提示
     url(r'^error_send_msg$', qiniu_oper.error_send_msg),
 
+    # 外部查询文章
+    url(r'^external_query_article/(?P<oper_type>\w+)$', external_query_article.external_query_article),
 
 
 
