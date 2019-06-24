@@ -305,6 +305,13 @@ class AddRepostsForm(forms.Form):
             'required': "编辑名称不能为空"
         }
     )
+    toward_whether = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "是否对外不能为空"
+        }
+    )
+
     def clean_classfiy_id(self):
         classfiy_id = self.data.get('classfiy_id')
         objs = models.classfiy.objects.filter(id=classfiy_id)

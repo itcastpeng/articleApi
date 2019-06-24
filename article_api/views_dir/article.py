@@ -172,10 +172,12 @@ def article_oper(request, oper_type, o_id):
             edit_name = request.POST.get('edit_name') # 别名
             reprint_link = request.POST.get('reprint_link')
             classfiy_id = request.POST.get('classfiy_id')  # 类别
+            toward_whether = request.POST.get('toward_whether', 0)  # 是否对外公开
             form_data = {
                 'reprint_link': reprint_link,
                 'classfiy_id': classfiy_id,
-                'edit_name': edit_name
+                'edit_name': edit_name,
+                'toward_whether': toward_whether
             }
 
             response.code = 301
