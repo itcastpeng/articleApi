@@ -217,6 +217,14 @@ def article_oper(request, oper_type, o_id):
 
             response.msg = msg
 
+        # 修改是否对公
+        elif oper_type == 'update_closed_public':
+            models.article.objects.filter(id=o_id).update(
+                toward_whether=form_data.get('toward_whether')
+            )
+            response.code = 200
+            response.msg = '修改成功'
+
     else:
 
         # 测试
