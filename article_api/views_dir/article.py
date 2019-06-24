@@ -102,16 +102,16 @@ def article_oper(request, oper_type, o_id):
 
         form_data = {
             'o_id':o_id,
-            'belongToUser_id': request.GET.get('user_id'),          # 操作人ID
-            'title': request.POST.get('title'),                     # 文章标题
-            'summary': request.POST.get('summary'),                 # 文章摘要
-            'article_cover': request.POST.get('article_cover'),     # 文章封面图片
-            'content': request.POST.get('content'),                 # 文章内容
+            'belongToUser_id': request.GET.get('user_id'),                  # 操作人ID
+            'title': request.POST.get('title'),                             # 文章标题
+            'summary': request.POST.get('summary'),                         # 文章摘要
+            'article_cover': request.POST.get('article_cover'),             # 文章封面图片
+            'content': request.POST.get('content'),                         # 文章内容
             'article_word_count':request.POST.get('article_word_count', 0), # 文章字数
-            'edit_name': request.POST.get('edit_name'),             # 编辑别名
-            'article_source': request.POST.get('article_source'),   # 文章来源
-            'classfiy_id': request.POST.get('classfiy_id'),         # 类别
-            'toward_whether': request.POST.get('toward_whether', 0)    # 是否对外公开
+            'edit_name': request.POST.get('edit_name'),                     # 编辑别名
+            'article_source': request.POST.get('article_source'),           # 文章来源
+            'classfiy_id': request.POST.get('classfiy_id'),                 # 类别
+            'toward_whether': request.POST.get('toward_whether', 0)         # 是否对外公开
         }
 
 
