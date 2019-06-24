@@ -46,10 +46,13 @@ def error_send_msg(request):
 
 def get_case(request):
     response = Response.ResponseObj()
-    objs = models.pachong.objects.all().order_by('create_date')
+    objs = models.pachong.objects.filter(is_use=0).order_by('create_date')
     if objs:
-        response.code = 200
         obj = objs[0]
+        obj.is_use = 1
+        obj.save()
+
+        response.code = 200
         response.data = obj.url
 
     else:

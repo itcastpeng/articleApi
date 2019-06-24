@@ -80,6 +80,7 @@ class article(models.Model):
 class pachong(models.Model):
     create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     url = models.TextField(verbose_name='链接')
+    is_use = models.BooleanField(verbose_name='是否使用', default=0)
 
 
 
