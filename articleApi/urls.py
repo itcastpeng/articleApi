@@ -54,7 +54,10 @@ urlpatterns = [
 
     # 错误 提示
     url(r'^error_send_msg$', qiniu_oper.error_send_msg),
+
+    # 爬虫临时使用
     url(r'^get_case$', qiniu_oper.get_case),
+    url(r'^get_yuemei_case$', qiniu_oper.get_yuemei_case),
 
     # 外部查询文章
     url(r'^external_query_article/(?P<oper_type>\w+)$', external_query_article.external_query_article),
