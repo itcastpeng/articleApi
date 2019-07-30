@@ -76,12 +76,6 @@ class article(models.Model):
     toward_whether = models.BooleanField(verbose_name='是否对公, 别的项目是否可查看该文章', default=0)
 
 
-# 临时使用 爬虫链接存放
-class pachong(models.Model):
-    create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    url = models.TextField(verbose_name='链接')
-    is_use = models.BooleanField(verbose_name='是否使用', default=0)
-
 # 悦美爬虫
 class yuemei(models.Model):
     create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)

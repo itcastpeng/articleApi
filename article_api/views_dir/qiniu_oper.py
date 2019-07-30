@@ -36,28 +36,9 @@ def error_send_msg(request):
     # response.code = 200
     # response.msg = '已发送错误消息'
     url = request.GET.get('url')
-    objs = models.pachong.objects.filter(url=url)
-    if not objs:
-        models.pachong.objects.create(
-            url=url
-        )
 
     return JsonResponse(response.__dict__)
 
-def get_case(request):
-    response = Response.ResponseObj()
-    objs = models.pachong.objects.filter(is_use=0).order_by('create_date')
-    if objs:
-        obj = objs[0]
-        obj.is_use = 1
-        obj.save()
-
-        response.code = 200
-        response.data = obj.url
-
-    else:
-        response.code = 301
-    return JsonResponse(response.__dict__)
 
 
 def get_yuemei_case(request):
